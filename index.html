@@ -188,44 +188,52 @@
         </div>
     </div>
 
-    <!-- MODAL DE DETALHES DE PERFORMANCE DO SUPERVISOR -->
-    <div id="supervisor-modal" class="fixed inset-0 bg-black/85 flex items-center justify-center hidden z-50">
-        <div class="bg-darkCard border border-slate-700 p-6 rounded-2xl max-w-5xl w-full relative mx-4">
-            <button onclick="closeModal('supervisor-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+    <!-- MODAL DE DETALHES DE PERFORMANCE DO SUPERVISOR (AJUSTADO E TOTALMENTE RESPONSIVO) -->
+    <div id="supervisor-modal" class="fixed inset-0 bg-black/85 flex items-center justify-center hidden z-50 p-2 sm:p-4">
+        <div class="bg-darkCard border border-slate-700 p-4 sm:p-6 rounded-2xl max-w-5xl w-full relative mx-auto flex flex-col max-h-[90vh] overflow-y-auto shadow-2xl">
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Botão de fechar otimizado para Mobile (Mais fácil de clicar no canto superior direito) -->
+            <button onclick="closeModal('supervisor-modal')" class="absolute top-3 right-3 sm:top-4 sm:right-4 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 h-10 w-10 flex items-center justify-center rounded-full transition z-10">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            
+            <!-- Conteúdo em Grid (1 coluna no mobile e 2 no computador) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 pt-4">
                 
                 <!-- COLUNA ESQUERDA: PERFORMANCE DO SUPERVISOR -->
-                <div>
-                    <div class="flex items-center gap-4 mb-6">
-                        <img id="sup-modal-img" class="h-16 w-16 rounded-full object-cover border-2 border-vieiraYellow bg-slate-800" src="" alt="" onerror="this.src='https://via.placeholder.com/150/131a2c/ffffff?text=S'">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4">
+                        <!-- shrink-0 impede o navegador de esmagar a imagem do supervisor no mobile -->
+                        <img id="sup-modal-img" class="h-16 w-16 rounded-full object-cover border-2 border-vieiraYellow bg-slate-800 shrink-0" src="" alt="" onerror="this.src='https://via.placeholder.com/150/131a2c/ffffff?text=S'">
                         <div>
-                            <h3 id="sup-modal-name" class="text-lg font-bold text-white">Supervisor</h3>
-                            <p class="text-xs text-slate-400">Análise Consolidada de Desempenho Comercial</p>
+                            <h3 id="sup-modal-name" class="text-base sm:text-lg font-bold text-white leading-tight">Supervisor</h3>
+                            <p class="text-[11px] sm:text-xs text-slate-400">Análise Consolidada de Performance</p>
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div class="bg-darkBg p-3 rounded-lg">
-                            <p class="text-[10px] text-slate-400 uppercase">Faturamento Médio</p>
-                            <p id="sup-modal-fat" class="text-sm font-bold text-white">R$ 0,00</p>
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                        <div class="bg-darkBg p-3 rounded-xl border border-slate-800">
+                            <p class="text-[10px] text-slate-400 uppercase tracking-wide">Faturamento Médio</p>
+                            <p id="sup-modal-fat" class="text-sm sm:text-base font-extrabold text-white">R$ 0,00</p>
                         </div>
-                        <div class="bg-darkBg p-3 rounded-lg">
-                            <p class="text-[10px] text-slate-400 uppercase">Positivação Média</p>
-                            <p id="sup-modal-pos" class="text-sm font-bold text-white">0 Clientes</p>
+                        <div class="bg-darkBg p-3 rounded-xl border border-slate-800">
+                            <p class="text-[10px] text-slate-400 uppercase tracking-wide">Positivação Média</p>
+                            <p id="sup-modal-pos" class="text-sm sm:text-base font-extrabold text-white">0 Clientes</p>
                         </div>
                     </div>
                     
-                    <h4 class="text-xs font-bold text-vieiraYellow uppercase mb-3">Evolução Mensal (MoM)</h4>
-                    <div id="sup-modal-mom-list" class="space-y-2 max-h-56 overflow-y-auto pr-2"></div>
+                    <div>
+                        <h4 class="text-xs font-bold text-vieiraYellow uppercase tracking-wider mb-2">Evolução Mensal (MoM)</h4>
+                        <div id="sup-modal-mom-list" class="space-y-1.5 max-h-40 sm:max-h-56 overflow-y-auto pr-2 bg-darkBg/50 p-2.5 rounded-xl border border-slate-800"></div>
+                    </div>
                 </div>
                 
                 <!-- COLUNA DIREITA: EQUIPE DE VENDEDORES ASSOCIADOS (RANKING INTEGRADO) -->
-                <div class="border-t md:border-t-0 md:border-l border-slate-700 pt-6 md:pt-0 md:pl-8">
-                    <h3 class="text-sm font-bold text-vieiraYellow uppercase mb-4 flex items-center gap-2">
+                <div class="border-t md:border-t-0 md:border-l border-slate-800 pt-5 md:pt-0 md:pl-6 flex flex-col min-h-0">
+                    <h3 class="text-xs sm:text-sm font-bold text-vieiraYellow uppercase mb-3 flex items-center gap-2">
                         <i class="fa-solid fa-users"></i> Ranking da Equipe de Vendas
                     </h3>
-                    <div id="sup-modal-team-list" class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                    <div id="sup-modal-team-list" class="space-y-2.5 overflow-y-auto pr-2 flex-1 max-h-[300px] md:max-h-[380px]">
                         <p class="text-xs text-slate-400">Carregando equipe...</p>
                     </div>
                 </div>
@@ -244,15 +252,15 @@
     </div>
 
     <!-- MODAL DE RANKING GERAL DE VENDEDORES -->
-    <div id="global-ranking-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center hidden z-50">
-        <div class="bg-darkCard border border-slate-700 p-6 rounded-2xl max-w-[1100px] w-full relative mx-4 flex flex-col h-[85vh]">
-            <button onclick="closeModal('global-ranking-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+    <div id="global-ranking-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center hidden z-50 p-2 sm:p-4">
+        <div class="bg-darkCard border border-slate-700 p-4 sm:p-6 rounded-2xl max-w-[1100px] w-full relative mx-auto flex flex-col h-[85vh]">
+            <button onclick="closeModal('global-ranking-modal')" class="absolute top-3 right-3 sm:top-4 sm:right-4 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 h-10 w-10 flex items-center justify-center rounded-full transition z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
             
-            <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4 md:pt-0">
                 <div class="flex items-center gap-3">
                     <span class="text-3xl">🏆</span>
                     <div>
-                        <h3 class="text-xl font-bold text-white tracking-wide">Ranking Geral de Vendedores</h3>
+                        <h3 class="text-lg sm:text-xl font-bold text-white tracking-wide">Ranking Geral de Vendedores</h3>
                         <p class="text-xs text-slate-400">Performance comercial apresentada em valores de MÉDIAS mensais</p>
                     </div>
                 </div>
@@ -275,24 +283,25 @@
                 </div>
             </div>
 
-            <div class="flex-1 overflow-y-auto pr-2">
-                <table class="w-full text-left text-sm text-slate-300">
-                    <thead>
-                        <tr class="border-b border-slate-700 text-slate-400 sticky top-0 bg-darkCard z-10 text-xs uppercase">
-                            <th class="py-3 px-2 text-center w-20">Posição</th>
-                            <th class="py-3 px-4 w-16">Foto</th>
-                            <th class="py-3 px-4">Vendedor</th>
-                            <th class="py-3 px-4">Supervisor</th>
-                            <th class="py-3 px-4 text-right">Média Positivação</th>
-                            <!-- COLUNA DINÂMICA: Exibe a premiação caso um dos meses de campanha seja selecionado -->
-                            <th id="ranking-header-campanha" class="py-3 px-4 text-center hidden">Campanha 🎯</th>
-                            <th class="py-3 px-4 text-right">Média Fat. Líquido</th>
-                        </tr>
-                    </thead>
-                    <tbody id="global-ranking-body" class="divide-y divide-slate-800">
-                        <!-- Conteúdo populado dinamicamente -->
-                    </tbody>
-                </table>
+            <div class="flex-1 overflow-x-auto min-h-0">
+                <div class="inline-block min-w-full align-middle h-full overflow-y-auto">
+                    <table class="w-full text-left text-sm text-slate-300">
+                        <thead>
+                            <tr class="border-b border-slate-700 text-slate-400 sticky top-0 bg-darkCard z-10 text-xs uppercase">
+                                <th class="py-3 px-2 text-center w-20">Posição</th>
+                                <th class="py-3 px-4 w-16">Foto</th>
+                                <th class="py-3 px-4">Vendedor</th>
+                                <th class="py-3 px-4">Supervisor</th>
+                                <th class="py-3 px-4 text-right">Média Positivação</th>
+                                <th id="ranking-header-campanha" class="py-3 px-4 text-center hidden">Campanha 🎯</th>
+                                <th class="py-3 px-4 text-right">Média Fat. Líquido</th>
+                            </tr>
+                        </thead>
+                        <tbody id="global-ranking-body" class="divide-y divide-slate-800">
+                            <!-- Conteúdo populado dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -303,8 +312,6 @@
         let globalData = [];
         let currentRankingData = []; 
         const mesesOrdem = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-
-        // Lista de meses que possuem campanha ativa
         const mesesCampanha = ["Julho", "Agosto", "Setembro"];
 
         function getSupervisorImg(name) {
@@ -466,11 +473,10 @@
             renderChart(mesesAtivos, mensalConsolidado);
         }
 
-        // NOVO: Função para cálculo de campanha comercial
         function getCampaignResult(posCount) {
             const pos = Math.round(posCount);
             if (pos < 35) {
-                return { startou: false, premio: 0, taxa: 0, faltam: 35 - pos, html: `<span class="bg-red-500/10 text-red-400 text-xs px-2.5 py-1 rounded-full font-bold border border-red-500/20">🔴 Pendente (Faltam ${35 - pos})</span>` };
+                return { startou: false, premio: 0, taxa: 0, faltam: 35 - pos, html: `<span class="bg-red-500/10 text-red-400 text-xs px-2.5 py-1 rounded-full font-bold border border-red-500/20">🔴 Faltam ${35 - pos}</span>` };
             }
             
             let taxa = 1;
@@ -479,18 +485,18 @@
             
             if (pos >= 35 && pos <= 50) {
                 taxa = 1;
-                label = "🟢 Startou! (R$ 1/clt)";
+                label = "🟢 R$ 1/clt";
             } else if (pos >= 51 && pos <= 60) {
                 taxa = 2;
-                label = "🔥 Superou! (R$ 2/clt)";
+                label = "🔥 R$ 2/clt";
                 badgeColor = "bg-cyan-500/10 text-cyan-400 border-cyan-500/20";
             } else if (pos >= 61 && pos <= 70) {
                 taxa = 3;
-                label = "⚡ Alavancou! (R$ 3/clt)";
+                label = "⚡ R$ 3/clt";
                 badgeColor = "bg-amber-500/10 text-amber-400 border-amber-500/20";
             } else {
                 taxa = 4;
-                label = "👑 Top Perf! (R$ 4/clt)";
+                label = "👑 R$ 4/clt";
                 badgeColor = "bg-violet-500/10 text-violet-400 border-violet-500/20";
             }
 
@@ -499,14 +505,13 @@
                 startou: true,
                 premio: totalPremio,
                 taxa: taxa,
-                html: `<div class="flex flex-col items-center gap-1">
-                        <span class="${badgeColor} text-[11px] px-2 py-0.5 rounded-full font-bold border">${label}</span>
-                        <span class="text-white font-black text-sm">${formatCurrency(totalPremio)}</span>
+                html: `<div class="flex flex-col items-center gap-0.5">
+                        <span class="${badgeColor} text-[10px] px-2 py-0.5 rounded-full font-bold border">${label}</span>
+                        <span class="text-white font-black text-xs">${formatCurrency(totalPremio)}</span>
                        </div>`
             };
         }
 
-        // Monta os dados do ranking aplicando médias e a premiação de campanha caso ativada
         function buildGlobalRankingTable() {
             const selectedMonth = document.getElementById('ranking-filter-mes').value;
             let vendMesData = {};
@@ -585,9 +590,9 @@
 
                 return `
                     <tr class="hover:bg-slate-800/40 transition border-b border-slate-800">
-                        <td class="py-3 px-2 text-center font-bold text-white text-md">${medalha}</td>
+                        <td class="py-3 px-2 text-center font-bold text-white text-sm">${medalha}</td>
                         <td class="py-3 px-4">
-                            <img class="h-10 w-10 rounded-full object-cover border border-slate-700 bg-slate-800" src="${imgSrc}" onerror="this.src='https://via.placeholder.com/100/131a2c/ffffff?text=${cleanCode}'">
+                            <img class="h-10 w-10 rounded-full object-cover border border-slate-700 bg-slate-800 shrink-0" src="${imgSrc}" onerror="this.src='https://via.placeholder.com/100/131a2c/ffffff?text=${cleanCode}'">
                         </td>
                         <td class="py-3 px-4 font-semibold text-slate-200">
                             ${vendedor.name} <span class="text-xs text-slate-500">(Cod: ${cleanCode})</span>
@@ -595,10 +600,9 @@
                         <td class="py-3 px-4 font-medium text-slate-400">
                             ${vendedor.supervisor}
                         </td>
-                        <td class="py-3 px-4 text-right font-bold text-vieiraYellow text-md">
+                        <td class="py-3 px-4 text-right font-bold text-vieiraYellow text-sm">
                             ${Math.round(vendedor.mediaPositivacao)} Clientes
                         </td>
-                        <!-- COLUNA DINÂMICA DE CAMPANHA -->
                         <td class="py-3 px-4 text-center ${isCampaignActive ? '' : 'hidden'}">
                             ${vendedor.campanhaObj.html}
                         </td>
@@ -610,7 +614,6 @@
             }).join('');
         }
 
-        // CSV com suporte à coluna de bônus
         function exportRankingToCSV() {
             if (currentRankingData.length === 0) return alert("Não há dados para exportar.");
             
@@ -646,7 +649,6 @@
             document.body.removeChild(link);
         }
 
-        // XLS com suporte à coluna de bônus
         function exportRankingToXLS() {
             if (currentRankingData.length === 0) return alert("Não há dados para exportar.");
 
@@ -756,7 +758,7 @@
                 return `
                     <tr onclick="openProductModal('${p.name}', '${p.cod}')" class="border-b border-slate-800 hover:bg-slate-800/40 transition cursor-pointer">
                         <td class="py-2 flex items-center gap-2">
-                            <img src="Imagens_produtos/${imgPath}" class="h-8 w-8 rounded object-cover bg-white" onerror="this.src='https://via.placeholder.com/50?text=DV'">
+                            <img src="Imagens_produtos/${imgPath}" class="h-8 w-8 rounded object-cover bg-white shrink-0" onerror="this.src='https://via.placeholder.com/50?text=DV'">
                             <span class="font-medium text-slate-200 truncate max-w-[150px] underline decoration-dotted">${p.name}</span>
                         </td>
                         <td class="py-2 text-right font-semibold text-white">${formatCurrency(p.mediaFat)}</td>
@@ -819,7 +821,7 @@
 
                 return `
                     <div class="flex items-center gap-4 bg-darkBg border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
-                        <img class="h-14 w-14 rounded-full object-cover border-2 border-slate-700 bg-slate-800" src="${imgSrc}" onerror="this.src='https://via.placeholder.com/100/131a2c/ffffff?text=${cleanCode}'">
+                        <img class="h-14 w-14 rounded-full object-cover border-2 border-slate-700 bg-slate-800 shrink-0" src="${imgSrc}" onerror="this.src='https://via.placeholder.com/100/131a2c/ffffff?text=${cleanCode}'">
                         <div class="flex-1 min-w-0">
                             <h4 class="text-xs font-bold text-white truncate">${member.name} <span class="text-[10px] text-slate-500">(Cod: ${cleanCode})</span></h4>
                             <div class="grid grid-cols-2 gap-2 mt-1 text-[11px] text-slate-300">
@@ -937,7 +939,7 @@
 
                 container.innerHTML += `
                     <div class="bg-darkBg border border-slate-800 p-4 rounded-xl flex items-center gap-4 hover:border-vieiraYellow/50 transition">
-                        <img onclick="openSupervisorDetails('${name}', '${cleanCode}')" class="h-16 w-16 rounded-full object-cover border-2 border-slate-700 hover:border-vieiraYellow cursor-pointer bg-slate-800" src="${imgSrc}" onerror="this.src='https://via.placeholder.com/150/131a2c/ffffff?text=${name.substring(0,1)}'">
+                        <img onclick="openSupervisorDetails('${name}', '${cleanCode}')" class="h-16 w-16 rounded-full object-cover border-2 border-slate-700 hover:border-vieiraYellow cursor-pointer bg-slate-800 shrink-0" src="${imgSrc}" onerror="this.src='https://via.placeholder.com/150/131a2c/ffffff?text=${name.substring(0,1)}'">
                         <div class="flex-1">
                             <h4 class="text-sm font-bold text-white">${name}</h4>
                             <p class="text-xs text-slate-400 mt-0.5">${formatCurrency(info.fat)}</p>
