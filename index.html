@@ -245,7 +245,7 @@
 
     <!-- MODAL DE RANKING GERAL DE VENDEDORES -->
     <div id="global-ranking-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center hidden z-50">
-        <div class="bg-darkCard border border-slate-700 p-6 rounded-2xl max-w-5xl w-full relative mx-4 flex flex-col h-[85vh]">
+        <div class="bg-darkCard border border-slate-700 p-6 rounded-2xl max-w-[1100px] w-full relative mx-4 flex flex-col h-[85vh]">
             <button onclick="closeModal('global-ranking-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
             
             <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -253,18 +253,17 @@
                     <span class="text-3xl">🏆</span>
                     <div>
                         <h3 class="text-xl font-bold text-white tracking-wide">Ranking Geral de Vendedores</h3>
-                        <p class="text-xs text-slate-400">Métricas apresentadas em valores de MÉDIAS mensais</p>
+                        <p class="text-xs text-slate-400">Performance comercial apresentada em valores de MÉDIAS mensais</p>
                     </div>
                 </div>
                 
-                <!-- Filtro de Mês e botões de exportar ao lado dele -->
+                <!-- Filtro de Mês e botões de exportação -->
                 <div class="flex flex-wrap items-center gap-3">
                     <div class="flex items-center gap-2">
                         <label class="text-xs text-slate-400 whitespace-nowrap">Filtrar por Mês:</label>
                         <select id="ranking-filter-mes" onchange="buildGlobalRankingTable()" class="bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-vieiraRed outline-none min-w-[150px]"></select>
                     </div>
                     
-                    <!-- NOVOS: Opções de exportar CSV e XLS ao lado do filtro -->
                     <div class="flex gap-1.5">
                         <button onclick="exportRankingToCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold py-2 px-3 rounded-lg text-xs flex items-center gap-1.5 transition">
                             <i class="fa-solid fa-file-csv text-emerald-400"></i> Exportar CSV
@@ -283,9 +282,10 @@
                             <th class="py-3 px-2 text-center w-20">Posição</th>
                             <th class="py-3 px-4 w-16">Foto</th>
                             <th class="py-3 px-4">Vendedor</th>
-                            <!-- NOVA COLUNA: Supervisor -->
                             <th class="py-3 px-4">Supervisor</th>
                             <th class="py-3 px-4 text-right">Média Positivação</th>
+                            <!-- COLUNA DINÂMICA: Exibe a premiação caso um dos meses de campanha seja selecionado -->
+                            <th id="ranking-header-campanha" class="py-3 px-4 text-center hidden">Campanha 🎯</th>
                             <th class="py-3 px-4 text-right">Média Fat. Líquido</th>
                         </tr>
                     </thead>
@@ -301,8 +301,11 @@
     <script>
         let myChart = null;
         let globalData = [];
-        let currentRankingData = []; // Armazena temporariamente para exportação instantânea
+        let currentRankingData = []; 
         const mesesOrdem = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+        // Lista de meses que possuem campanha ativa
+        const mesesCampanha = ["Julho", "Agosto", "Setembro"];
 
         function getSupervisorImg(name) {
             if (!name) return 'https://via.placeholder.com/150/131a2c/ffffff?text=S';
@@ -452,9 +455,9 @@
             let totalCidades = {};
             filtered.forEach(item => {
                 const vBruta = parseFloat(item.VendaBruta || 0);
-                const cidade = item.Cidade || "";
-                if (cidade && vBruta > 0) {
-                    totalCidades[cidade] = (totalCidades[cidade] || 0) + vBruta;
+                const city = item.Cidade || "";
+                if (city && vBruta > 0) {
+                    totalCidades[city] = (totalCidades[city] || 0) + vBruta;
                 }
             });
             renderCidadesTable('table-cidades', totalCidades);
@@ -463,10 +466,59 @@
             renderChart(mesesAtivos, mensalConsolidado);
         }
 
-        // Monta os dados do ranking aplicando médias e mapeia o Supervisor correspondente
+        // NOVO: Função para cálculo de campanha comercial
+        function getCampaignResult(posCount) {
+            const pos = Math.round(posCount);
+            if (pos < 35) {
+                return { startou: false, premio: 0, taxa: 0, faltam: 35 - pos, html: `<span class="bg-red-500/10 text-red-400 text-xs px-2.5 py-1 rounded-full font-bold border border-red-500/20">🔴 Pendente (Faltam ${35 - pos})</span>` };
+            }
+            
+            let taxa = 1;
+            let label = "Startou!";
+            let badgeColor = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+            
+            if (pos >= 35 && pos <= 50) {
+                taxa = 1;
+                label = "🟢 Startou! (R$ 1/clt)";
+            } else if (pos >= 51 && pos <= 60) {
+                taxa = 2;
+                label = "🔥 Superou! (R$ 2/clt)";
+                badgeColor = "bg-cyan-500/10 text-cyan-400 border-cyan-500/20";
+            } else if (pos >= 61 && pos <= 70) {
+                taxa = 3;
+                label = "⚡ Alavancou! (R$ 3/clt)";
+                badgeColor = "bg-amber-500/10 text-amber-400 border-amber-500/20";
+            } else {
+                taxa = 4;
+                label = "👑 Top Perf! (R$ 4/clt)";
+                badgeColor = "bg-violet-500/10 text-violet-400 border-violet-500/20";
+            }
+
+            const totalPremio = pos * taxa;
+            return {
+                startou: true,
+                premio: totalPremio,
+                taxa: taxa,
+                html: `<div class="flex flex-col items-center gap-1">
+                        <span class="${badgeColor} text-[11px] px-2 py-0.5 rounded-full font-bold border">${label}</span>
+                        <span class="text-white font-black text-sm">${formatCurrency(totalPremio)}</span>
+                       </div>`
+            };
+        }
+
+        // Monta os dados do ranking aplicando médias e a premiação de campanha caso ativada
         function buildGlobalRankingTable() {
             const selectedMonth = document.getElementById('ranking-filter-mes').value;
             let vendMesData = {};
+
+            const isCampaignActive = mesesCampanha.includes(selectedMonth);
+            const headerCampanha = document.getElementById('ranking-header-campanha');
+            
+            if (isCampaignActive) {
+                headerCampanha.classList.remove('hidden');
+            } else {
+                headerCampanha.classList.add('hidden');
+            }
 
             const dataToRank = globalData.filter(item => {
                 return !selectedMonth || item.Mês === selectedMonth;
@@ -476,7 +528,7 @@
                 const ven = item.Vendedor;
                 const cod = item.CodigoVendedor;
                 const mes = item.Mês;
-                const sup = item.Supervisor || "Sem Supervisor"; // Pega o supervisor mapeado
+                const sup = item.Supervisor || "Sem Supervisor";
                 const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
                 const cliente = item.Cliente || "";
 
@@ -506,12 +558,16 @@
                     somaPos += info.meses[m].clientes.size;
                 });
 
+                const mediaPos = somaPos / totalMesesAtivos;
+                const campaign = getCampaignResult(mediaPos);
+
                 return {
                     name: name,
                     cod: info.cod,
                     supervisor: info.supervisor,
-                    mediaPositivacao: somaPos / totalMesesAtivos,
-                    mediaFaturamento: somaFat / totalMesesAtivos
+                    mediaPositivacao: mediaPos,
+                    mediaFaturamento: somaFat / totalMesesAtivos,
+                    campanhaObj: campaign
                 };
             }).sort((a, b) => b.mediaPositivacao - a.mediaPositivacao);
 
@@ -536,32 +592,51 @@
                         <td class="py-3 px-4 font-semibold text-slate-200">
                             ${vendedor.name} <span class="text-xs text-slate-500">(Cod: ${cleanCode})</span>
                         </td>
-                        <!-- NOVO: Exibe o nome do supervisor do vendedor na coluna -->
                         <td class="py-3 px-4 font-medium text-slate-400">
                             ${vendedor.supervisor}
                         </td>
-                        <td class="py-3 px-4 text-right font-bold text-vieiraYellow text-md">${Math.round(vendedor.mediaPositivacao)} Clientes</td>
-                        <td class="py-3 px-4 text-right font-semibold text-emerald-400">${formatCurrency(vendedor.mediaFaturamento)}</td>
+                        <td class="py-3 px-4 text-right font-bold text-vieiraYellow text-md">
+                            ${Math.round(vendedor.mediaPositivacao)} Clientes
+                        </td>
+                        <!-- COLUNA DINÂMICA DE CAMPANHA -->
+                        <td class="py-3 px-4 text-center ${isCampaignActive ? '' : 'hidden'}">
+                            ${vendedor.campanhaObj.html}
+                        </td>
+                        <td class="py-3 px-4 text-right font-semibold text-emerald-400">
+                            ${formatCurrency(vendedor.mediaFaturamento)}
+                        </td>
                     </tr>
                 `;
             }).join('');
         }
 
-        // NOVAS FUNÇÕES: Geração de arquivos CSV e XLS dinâmicos para download direto pelo navegador
+        // CSV com suporte à coluna de bônus
         function exportRankingToCSV() {
             if (currentRankingData.length === 0) return alert("Não há dados para exportar.");
             
-            let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // Garante acentuação correta em português (UTF-8 com BOM)
-            csvContent += "Posicao;Vendedor;Codigo;Supervisor;Media Positivacao (Clientes);Media Faturamento (R$)\n";
+            const selectedMonth = document.getElementById('ranking-filter-mes').value || "Geral";
+            const isCampaignActive = mesesCampanha.includes(selectedMonth);
+
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
+            if (isCampaignActive) {
+                csvContent += "Posicao;Vendedor;Codigo;Supervisor;Media Positivacao (Clientes);Bonus Campanha (R$);Media Faturamento (R$)\n";
+            } else {
+                csvContent += "Posicao;Vendedor;Codigo;Supervisor;Media Positivacao (Clientes);Media Faturamento (R$)\n";
+            }
 
             currentRankingData.forEach((v, index) => {
                 const pos = index + 1;
                 const fatFormated = v.mediaFaturamento.toFixed(2).replace('.', ',');
                 const posFormated = Math.round(v.mediaPositivacao);
-                csvContent += `${pos};"${v.name}";"${v.cod}";"${v.supervisor}";${posFormated};${fatFormated}\n`;
+                
+                if (isCampaignActive) {
+                    const premioFormated = v.campanhaObj.premio.toFixed(2).replace('.', ',');
+                    csvContent += `${pos};"${v.name}";"${v.cod}";"${v.supervisor}";${posFormated};${premioFormated};${fatFormated}\n`;
+                } else {
+                    csvContent += `${pos};"${v.name}";"${v.cod}";"${v.supervisor}";${posFormated};${fatFormated}\n`;
+                }
             });
 
-            const selectedMonth = document.getElementById('ranking-filter-mes').value || "Geral";
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
@@ -571,8 +646,12 @@
             document.body.removeChild(link);
         }
 
+        // XLS com suporte à coluna de bônus
         function exportRankingToXLS() {
             if (currentRankingData.length === 0) return alert("Não há dados para exportar.");
+
+            const selectedMonth = document.getElementById('ranking-filter-mes').value || "Geral";
+            const isCampaignActive = mesesCampanha.includes(selectedMonth);
 
             let htmlTable = `
                 <table border="1">
@@ -582,6 +661,7 @@
                         <th>Código</th>
                         <th>Supervisor</th>
                         <th>Média de Positivação (Clientes)</th>
+                        ${isCampaignActive ? '<th>Bônus Campanha (R$)</th>' : ''}
                         <th>Média de Faturamento Líquido (R$)</th>
                     </tr>
             `;
@@ -595,6 +675,7 @@
                         <td>${v.cod}</td>
                         <td>${v.supervisor}</td>
                         <td>${Math.round(v.mediaPositivacao)}</td>
+                        ${isCampaignActive ? `<td>${v.campanhaObj.premio.toFixed(2).replace('.', ',')}</td>` : ''}
                         <td>${v.mediaFaturamento.toFixed(2).replace('.', ',')}</td>
                     </tr>
                 `;
@@ -604,7 +685,6 @@
 
             const blob = new Blob([htmlTable], { type: "application/vnd.ms-excel" });
             const link = document.createElement("a");
-            const selectedMonth = document.getElementById('ranking-filter-mes').value || "Geral";
             link.href = URL.createObjectURL(blob);
             link.download = `Ranking_Vendedores_Medias_${selectedMonth}.xls`;
             document.body.appendChild(link);
@@ -989,7 +1069,6 @@
             document.getElementById(id).classList.add('hidden');
         }
 
-        // Formatação simples e limpa para moeda BRL
         function formatCurrency(val) {
             return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
