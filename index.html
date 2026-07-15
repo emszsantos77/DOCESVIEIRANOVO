@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decisões que Geram Valor - Doces Vieira</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        vieiraRed: '#ED1C24', 
+                        vieiraYellow: '#FBBF24', 
+                        darkBg: '#0B0F19', 
+                        darkCard: '#131A2C' 
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-darkBg text-slate-100 antialiased min-h-screen">
+
+    <!-- HEADER INSTITUCIONAL -->
+    <header class="bg-vieiraRed p-4 shadow-lg flex justify-between items-center border-b-4 border-vieiraYellow">
+        <div class="flex items-center gap-4">
+            <img src="logo-doces-vieira.png" alt="Doces Vieira" class="h-12 object-contain bg-white p-1 rounded">
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-wide">Decisões que Geram Valor</h1>
+                <p class="text-xs text-white/80">Dashboard de Acompanhamento Mensal & Performance Comercial</p>
+            </div>
+        </div>
+        <div class="bg-white/20 text-white px-3 py-1.5 rounded-full text-xs font-semibold animate-pulse flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-vieiraYellow"></span> Atualização em Tempo Real
+        </div>
+    </header>
+
+    <!-- CONTAINER PRINCIPAL -->
+    <main class="p-6 max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-5 gap-6">
+        
+        <!-- FILTROS LATERAIS -->
+        <section class="lg:col-span-1 bg-darkCard p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-vieiraYellow font-bold text-sm tracking-wider uppercase">Filtros Estratégicos</h2>
+                    <button onclick="clearFilters()" class="text-xs text-slate-400 hover:text-vieiraRed transition">Limpar Tudo</button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Ano</label>
+                        <select id="filter-ano" onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-vieiraRed outline-none"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Mês</label>
+                        <select id="filter-mes" onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-vieiraRed outline-none"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Supervisor</label>
+                        <select id="filter-supervisor" onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-vieiraRed outline-none"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Vendedor</label>
+                        <select id="filter-vendedor" onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-vieiraRed outline-none"></select>
+                    </div>
+                    
+                    <!-- Botão de ranking posicionado exatamente abaixo do último filtro de vendedor -->
+                    <div class="pt-4 border-t border-slate-800">
+                        <button onclick="openGlobalRankingModal()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-slate-900 font-bold py-3 px-4 rounded-xl shadow-lg hover:shadow-yellow-500/10 transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-wider">
+                            <i class="fa-solid fa-trophy text-sm"></i> Acessar Ranking Geral
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DASHBOARD CONTENT -->
+        <section class="lg:col-span-4 space-y-6">
+            
+            <!-- KPIs COM MÉDIAS E MoM -->
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div class="bg-darkCard p-4 rounded-xl border-l-4 border-vieiraRed shadow">
+                    <p class="text-xs text-slate-400 font-medium uppercase">Média Fat. Líquido</p>
+                    <p id="kpi-faturamento" class="text-2xl font-bold mt-1 text-white">R$ 0,00</p>
+                    <span id="mom-faturamento" class="text-xs font-semibold block mt-1 text-slate-400">MoM: --</span>
+                </div>
+                <div class="bg-darkCard p-4 rounded-xl border-l-4 border-vieiraYellow shadow">
+                    <p class="text-xs text-slate-400 font-medium uppercase">Média Posit. Líquida</p>
+                    <p id="kpi-positivacao" class="text-2xl font-bold mt-1 text-white">0 Clientes</p>
+                    <span id="mom-positivacao" class="text-xs font-semibold block mt-1 text-slate-400">MoM: --</span>
+                </div>
+                <div class="bg-darkCard p-4 rounded-xl border-l-4 border-emerald-500 shadow">
+                    <p class="text-xs text-slate-400 font-medium uppercase">Média Vendas Brutas</p>
+                    <p id="kpi-brutas" class="text-2xl font-bold mt-1 text-emerald-400">R$ 0,00</p>
+                    <span id="mom-brutas" class="text-xs font-semibold block mt-1 text-slate-400">MoM: --</span>
+                </div>
+                <div class="bg-darkCard p-4 rounded-xl border-l-4 border-amber-600 shadow">
+                    <p class="text-xs text-slate-400 font-medium uppercase">Ticket Médio / Clt</p>
+                    <p id="kpi-ticket" class="text-2xl font-bold mt-1 text-amber-500">R$ 0,00</p>
+                    <span id="mom-ticket" class="text-xs font-semibold block mt-1 text-slate-400">MoM: --</span>
+                </div>
+            </div>
+
+            <!-- ÁREA DO GRÁFICO INTEGRADO -->
+            <div class="bg-darkCard p-5 rounded-xl border border-slate-800">
+                <h3 class="text-sm font-bold text-vieiraYellow mb-4 flex items-center gap-2">📈 Evolução Histórica & Crescimento MoM</h3>
+                <div class="h-64 relative">
+                    <canvas id="chart-evolucao"></canvas>
+                </div>
+            </div>
+
+            <!-- TABELAS E GRÁFICOS -->
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <!-- Top Produtos -->
+                <div class="bg-darkCard p-4 rounded-xl border border-slate-800">
+                    <h3 class="text-sm font-bold text-vieiraYellow mb-3 flex items-center gap-2">📦 Top 5 Produtos Mais Vendidos</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead>
+                                <tr class="border-b border-slate-700 text-slate-400">
+                                    <th class="py-2">PRODUTO</th>
+                                    <th class="py-2 text-right">MÉDIA FAT.</th>
+                                    <th class="py-2 text-right">MÉDIA POSIT.</th>
+                                    <th class="py-2 text-right">MoM %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-produtos"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Top Cidades -->
+                <div class="bg-darkCard p-4 rounded-xl border border-slate-800">
+                    <h3 class="text-sm font-bold text-vieiraYellow mb-3 flex items-center gap-2">📍 Top 5 Cidades por Performance</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead>
+                                <tr class="border-b border-slate-700 text-slate-400">
+                                    <th class="py-2">CIDADE</th>
+                                    <th class="py-2 text-right">FATURAMENTO</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-cidades"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RANKING DE SUPERVISORES -->
+            <div class="bg-darkCard p-5 rounded-xl border border-slate-800">
+                <h3 class="text-sm font-bold text-vieiraYellow mb-4 flex items-center gap-2">👑 Performance de Supervisão</h3>
+                <div id="supervisors-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- MODAL DE DETALHES DE PERFORMANCE DO PRODUTO -->
+    <div id="product-modal" class="fixed inset-0 bg-black/85 flex items-center justify-center hidden z-50">
+        <div class="bg-darkCard border border-slate-700 p-6 rounded-2xl max-w-lg w-full relative mx-4">
+            <button onclick="closeModal('product-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="flex items-center gap-4 mb-6">
+                <img id="prod-modal-img" class="h-16 w-16 rounded object-contain border-2 border-slate-700 bg-white p-1" src="" alt="" onerror="this.src='https://via.placeholder.com/150/131a2c/ffffff?text=DV'">
+                <div>
+                    <h3 id="prod-modal-name" class="text-md font-bold text-white">Nome do Produto</h3>
+                    <p id="prod-modal-code" class="text-xs text-slate-400">Análise de Performance Comercial</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-darkBg p-3 rounded-lg">
+                    <p class="text-[10px] text-slate-400 uppercase">Faturamento Acumulado</p>
+                    <p id="prod-modal-fat" class="text-sm font-bold text-white">R$ 0,00</p>
+                </div>
+                <div class="bg-darkBg p-3 rounded-lg">
+                    <p class="text-[10px] text-slate-400 uppercase">Clientes Positivados</p>
+                    <p id="prod-modal-pos" class="text-sm font-bold text-white">0 Clientes</p>
+                </div>
+            </div>
+            <h4 class="text-xs font-bold text-vieiraYellow uppercase mb-3">Evolução Mensal do Produto (MoM)</h4>
+            <div id="prod-modal-mom-list" class="space-y-2 max-h-40 overflow-y-auto pr-2"></div>
+        </div>
+    </div>
+
+    <!-- MODAL DE DETALHES DE PERFORMANCE DO SUPERVISOR -->
+    <div id="supervisor-modal" class="fixed inset-0 bg-black/85 flex items-center justify-center hidden z-50">
+        <div class="bg-darkCard border border-slate-700 p-6 rounded-2xl max-w-5xl w-full relative mx-4">
+            <button onclick="closeModal('supervisor-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- COLUNA ESQUERDA: PERFORMANCE DO SUPERVISOR -->
+                <div>
+                    <div class="flex items-center gap-4 mb-6">
+                        <img id="sup-modal-img" class="h-16 w-16 rounded-full object-cover border-2 border-vieiraYellow bg-slate-800" src="" alt="" onerror="this.src='https://via.placeholder.com/150/131a2c/ffffff?text=S'">
+                        <div>
+                            <h3 id="sup-modal-name" class="text-lg font-bold text-white">Supervisor</h3>
+                            <p class="text-xs text-slate-400">Análise Consolidada de Desempenho Comercial</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-darkBg p-3 rounded-lg">
+                            <p class="text-[10px] text-slate-400 uppercase">Faturamento Médio</p>
+                            <p id="sup-modal-fat" class="text-sm font-bold text-white">R$ 0,00</p>
+                        </div>
+                        <div class="bg-darkBg p-3 rounded-lg">
+                            <p class="text-[10px] text-slate-400 uppercase">Positivação Média</p>
+                            <p id="sup-modal-pos" class="text-sm font-bold text-white">0 Clientes</p>
+                        </div>
+                    </div>
+                    
+                    <h4 class="text-xs font-bold text-vieiraYellow uppercase mb-3">Evolução Mensal (MoM)</h4>
+                    <div id="sup-modal-mom-list" class="space-y-2 max-h-56 overflow-y-auto pr-2"></div>
+                </div>
+                
+                <!-- COLUNA DIREITA: EQUIPE DE VENDEDORES ASSOCIADOS (RANKING INTEGRADO) -->
+                <div class="border-t md:border-t-0 md:border-l border-slate-700 pt-6 md:pt-0 md:pl-8">
+                    <h3 class="text-sm font-bold text-vieiraYellow uppercase mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-users"></i> Ranking da Equipe de Vendas
+                    </h3>
+                    <div id="sup-modal-team-list" class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                        <p class="text-xs text-slate-400">Carregando equipe...</p>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EXIBIÇÃO DE EQUIPE (MANTIDO INDEPENDENTE) -->
+    <div id="team-modal" class="fixed inset-0 bg-black/85 flex items-center justify-center hidden z-50">
+        <div class="bg-darkCard border border-slate-700 p-6 rounded-2xl max-w-2xl w-full relative mx-4">
+            <button onclick="closeModal('team-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 id="team-modal-title" class="text-md font-bold text-white mb-4">Equipe do Supervisor</h3>
+            <div class="max-h-96 overflow-y-auto space-y-3 pr-2" id="team-list"></div>
+        </div>
+    </div>
+
+    <!-- MODAL DE RANKING GERAL DE VENDEDORES -->
+    <div id="global-ranking-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center hidden z-50">
+        <div class="bg-darkCard border border-slate-700 p-6 rounded-2xl max-w-5xl w-full relative mx-4 flex flex-col h-[85vh]">
+            <button onclick="closeModal('global-ranking-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            
+            <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">🏆</span>
+                    <div>
+                        <h3 class="text-xl font-bold text-white tracking-wide">Ranking Geral de Vendedores</h3>
+                        <p class="text-xs text-slate-400">Métricas apresentadas em valores de MÉDIAS mensais</p>
+                    </div>
+                </div>
+                
+                <!-- Filtro de Mês e botões de exportar ao lado dele -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs text-slate-400 whitespace-nowrap">Filtrar por Mês:</label>
+                        <select id="ranking-filter-mes" onchange="buildGlobalRankingTable()" class="bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-vieiraRed outline-none min-w-[150px]"></select>
+                    </div>
+                    
+                    <!-- NOVOS: Opções de exportar CSV e XLS ao lado do filtro -->
+                    <div class="flex gap-1.5">
+                        <button onclick="exportRankingToCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold py-2 px-3 rounded-lg text-xs flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-file-csv text-emerald-400"></i> Exportar CSV
+                        </button>
+                        <button onclick="exportRankingToXLS()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold py-2 px-3 rounded-lg text-xs flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-file-excel text-emerald-500"></i> Exportar XLS
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto pr-2">
+                <table class="w-full text-left text-sm text-slate-300">
+                    <thead>
+                        <tr class="border-b border-slate-700 text-slate-400 sticky top-0 bg-darkCard z-10 text-xs uppercase">
+                            <th class="py-3 px-2 text-center w-20">Posição</th>
+                            <th class="py-3 px-4 w-16">Foto</th>
+                            <th class="py-3 px-4">Vendedor</th>
+                            <!-- NOVA COLUNA: Supervisor -->
+                            <th class="py-3 px-4">Supervisor</th>
+                            <th class="py-3 px-4 text-right">Média Positivação</th>
+                            <th class="py-3 px-4 text-right">Média Fat. Líquido</th>
+                        </tr>
+                    </thead>
+                    <tbody id="global-ranking-body" class="divide-y divide-slate-800">
+                        <!-- Conteúdo populado dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- CORE JAVASCRIPT -->
+    <script>
+        let myChart = null;
+        let globalData = [];
+        let currentRankingData = []; // Armazena temporariamente para exportação instantânea
+        const mesesOrdem = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+        function getSupervisorImg(name) {
+            if (!name) return 'https://via.placeholder.com/150/131a2c/ffffff?text=S';
+            const clean = name.toLowerCase()
+                              .normalize("NFD")
+                              .replace(/[\u0300-\u036f]/g, "") 
+                              .trim()
+                              .replace(/\s+/g, '_'); 
+            return `Imagens_Supervisores/${clean}.png`;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch('data.json?t=' + new Date().getTime())
+                .then(response => {
+                    if (!response.ok) throw new Error("Erro de rede");
+                    return response.json();
+                })
+                .then(data => {
+                    globalData = data;
+                    populateFilters();
+                    updateDashboard();
+                    populateRankingMonthFilter();
+                })
+                .catch(err => console.error("Erro na inicialização:", err));
+        });
+
+        function populateFilters() {
+            const anos = [...new Set(globalData.map(item => item.Ano))].filter(Boolean);
+            const meses = [...new Set(globalData.map(item => item.Mês))].filter(Boolean);
+            const supervisores = [...new Set(globalData.map(item => item.Supervisor))].filter(Boolean);
+            const vendedores = [...new Set(globalData.map(item => item.Vendedor))].filter(Boolean);
+
+            buildSelect('filter-ano', anos);
+            buildSelect('filter-mes', meses);
+            buildSelect('filter-supervisor', supervisores);
+            buildSelect('filter-vendedor', vendedores);
+        }
+
+        function populateRankingMonthFilter() {
+            const meses = [...new Set(globalData.map(item => item.Mês))].filter(Boolean);
+            const select = document.getElementById('ranking-filter-mes');
+            if (!select) return;
+            
+            const mesesOrdenados = meses.sort((a, b) => mesesOrdem.indexOf(a) - mesesOrdem.indexOf(b));
+            select.innerHTML = `<option value="">Todos os Meses</option>` + 
+                mesesOrdenados.map(m => `<option value="${m}">${m}</option>`).join('');
+        }
+
+        function buildSelect(id, items) {
+            const select = document.getElementById(id);
+            if (!select) return;
+            select.innerHTML = `<option value="">Todos</option>` + 
+                items.sort().map(item => `<option value="${item}">${item}</option>`).join('');
+        }
+
+        function updateDashboard() {
+            const fAno = document.getElementById('filter-ano').value;
+            const fMes = document.getElementById('filter-mes').value;
+            const fSup = document.getElementById('filter-supervisor').value;
+            const fVen = document.getElementById('filter-vendedor').value;
+
+            const filtered = globalData.filter(item => {
+                const ano = String(item.Ano || '');
+                const mes = String(item.Mês || '');
+                const sup = item.Supervisor || '';
+                const ven = item.Vendedor || '';
+
+                return (!fAno || ano === fAno) &&
+                       (!fMes || mes === fMes) &&
+                       (!fSup || sup === fSup) &&
+                       (!fVen || ven === fVen);
+            });
+
+            let mensalConsolidado = {};
+            filtered.forEach(item => {
+                const mes = item.Mês || "Desconhecido";
+                const vBruta = parseFloat(item.VendaBruta || 0);
+                const dev = parseFloat(item.Devolucao || 0);
+                const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
+                const cliente = item.Cliente || "";
+
+                if (!mensalConsolidado[mes]) {
+                    mensalConsolidado[mes] = { fatLiquido: 0, vendasBrutas: 0, devolucoes: 0, clientes: new Set() };
+                }
+
+                mensalConsolidado[mes].fatLiquido += vLiquida;
+                mensalConsolidado[mes].vendasBrutas += vBruta;
+                mensalConsolidado[mes].devolucoes += dev;
+                if (cliente && vLiquida > 0) {
+                    mensalConsolidado[mes].clientes.add(cliente);
+                }
+            });
+
+            const mesesAtivos = Object.keys(mensalConsolidado).sort((a, b) => mesesOrdem.indexOf(a) - mesesOrdem.indexOf(b));
+            const totalMeses = mesesAtivos.length || 1;
+
+            let somaFatLiquido = 0, somaVendasBrutas = 0, somaDevolucoes = 0, somaClientesPositivados = 0;
+            mesesAtivos.forEach(m => {
+                somaFatLiquido += mensalConsolidado[m].fatLiquido;
+                somaVendasBrutas += mensalConsolidado[m].vendasBrutas;
+                somaDevolucoes += mensalConsolidado[m].devolucoes;
+                somaClientesPositivados += mensalConsolidado[m].clientes.size;
+            });
+
+            const mediaFatLiquido = somaFatLiquido / totalMeses;
+            const mediaVendasBrutas = somaVendasBrutas / totalMeses;
+            const mediaClientesPositivados = Math.round(somaClientesPositivados / totalMeses);
+            const mediaTicket = mediaClientesPositivados > 0 ? (mediaFatLiquido / mediaClientesPositivados) : 0;
+
+            document.getElementById('kpi-faturamento').innerText = formatCurrency(mediaFatLiquido);
+            document.getElementById('kpi-positivacao').innerText = `${mediaClientesPositivados} Clientes/Mês`;
+            document.getElementById('kpi-brutas').innerText = formatCurrency(mediaVendasBrutas);
+            document.getElementById('kpi-ticket').innerText = formatCurrency(mediaTicket);
+
+            if (mesesAtivos.length >= 2) {
+                const mAtual = mesesAtivos[mesesAtivos.length - 1];
+                const isMesParcial = (mAtual === "Julho");
+                
+                const indexUlt = isMesParcial ? mesesAtivos.length - 2 : mesesAtivos.length - 1;
+                const indexPen = indexUlt - 1;
+
+                if (indexPen >= 0) {
+                    const ultMes = mesesAtivos[indexUlt];
+                    const penMes = mesesAtivos[indexPen];
+
+                    const pctFat = calcGrowth(mensalConsolidado[ultMes].fatLiquido, mensalConsolidado[penMes].fatLiquido);
+                    const pctPos = calcGrowth(mensalConsolidado[ultMes].clientes.size, mensalConsolidado[penMes].clientes.size);
+                    const pctBruto = calcGrowth(mensalConsolidado[ultMes].vendasBrutas, mensalConsolidado[penMes].vendasBrutas);
+                    
+                    const ticketUlt = mensalConsolidado[ultMes].clientes.size > 0 ? (mensalConsolidado[ultMes].fatLiquido / mensalConsolidado[ultMes].clientes.size) : 0;
+                    const ticketPen = mensalConsolidado[penMes].clientes.size > 0 ? (mensalConsolidado[penMes].fatLiquido / mensalConsolidado[penMes].clientes.size) : 0;
+                    const pctTicket = calcGrowth(ticketUlt, ticketPen);
+
+                    setMomUI('mom-faturamento', pctFat, false, ultMes);
+                    setMomUI('mom-positivacao', pctPos, false, ultMes);
+                    setMomUI('mom-brutas', pctBruto, false, ultMes);
+                    setMomUI('mom-ticket', pctTicket, false, ultMes);
+                }
+            } else {
+                ['mom-faturamento', 'mom-positivacao', 'mom-brutas', 'mom-ticket'].forEach(id => {
+                    document.getElementById(id).innerHTML = `<span class="text-slate-500">Sem histórico MoM</span>`;
+                });
+            }
+
+            renderTopProdutos(filtered);
+            
+            let totalCidades = {};
+            filtered.forEach(item => {
+                const vBruta = parseFloat(item.VendaBruta || 0);
+                const cidade = item.Cidade || "";
+                if (cidade && vBruta > 0) {
+                    totalCidades[cidade] = (totalCidades[cidade] || 0) + vBruta;
+                }
+            });
+            renderCidadesTable('table-cidades', totalCidades);
+
+            renderSupervisors(filtered);
+            renderChart(mesesAtivos, mensalConsolidado);
+        }
+
+        // Monta os dados do ranking aplicando médias e mapeia o Supervisor correspondente
+        function buildGlobalRankingTable() {
+            const selectedMonth = document.getElementById('ranking-filter-mes').value;
+            let vendMesData = {};
+
+            const dataToRank = globalData.filter(item => {
+                return !selectedMonth || item.Mês === selectedMonth;
+            });
+
+            dataToRank.forEach(item => {
+                const ven = item.Vendedor;
+                const cod = item.CodigoVendedor;
+                const mes = item.Mês;
+                const sup = item.Supervisor || "Sem Supervisor"; // Pega o supervisor mapeado
+                const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
+                const cliente = item.Cliente || "";
+
+                if (!ven) return;
+                if (!vendMesData[ven]) {
+                    vendMesData[ven] = { cod: cod, supervisor: sup, meses: {} };
+                }
+                if (!vendMesData[ven].meses[mes]) {
+                    vendMesData[ven].meses[mes] = { fat: 0, clientes: new Set() };
+                }
+
+                vendMesData[ven].meses[mes].fat += vLiquida;
+                if (cliente && vLiquida > 0) {
+                    vendMesData[ven].meses[mes].clientes.add(cliente);
+                }
+            });
+
+            currentRankingData = Object.entries(vendMesData).map(([name, info]) => {
+                const mesesEmAtividade = Object.keys(info.meses);
+                const totalMesesAtivos = mesesEmAtividade.length || 1;
+
+                let somaFat = 0;
+                let somaPos = 0;
+
+                mesesEmAtividade.forEach(m => {
+                    somaFat += info.meses[m].fat;
+                    somaPos += info.meses[m].clientes.size;
+                });
+
+                return {
+                    name: name,
+                    cod: info.cod,
+                    supervisor: info.supervisor,
+                    mediaPositivacao: somaPos / totalMesesAtivos,
+                    mediaFaturamento: somaFat / totalMesesAtivos
+                };
+            }).sort((a, b) => b.mediaPositivacao - a.mediaPositivacao);
+
+            const tbody = document.getElementById('global-ranking-body');
+            tbody.innerHTML = currentRankingData.map((vendedor, index) => {
+                const posicaoNum = index + 1;
+                let medalha = `${posicaoNum}º`;
+                
+                if (posicaoNum === 1) medalha = "🥇 1º";
+                else if (posicaoNum === 2) medalha = "🥈 2º";
+                else if (posicaoNum === 3) medalha = "🥉 3º";
+
+                const cleanCode = String(vendedor.cod).trim();
+                const imgSrc = `Imagens_Vendedores/${cleanCode}.png`;
+
+                return `
+                    <tr class="hover:bg-slate-800/40 transition border-b border-slate-800">
+                        <td class="py-3 px-2 text-center font-bold text-white text-md">${medalha}</td>
+                        <td class="py-3 px-4">
+                            <img class="h-10 w-10 rounded-full object-cover border border-slate-700 bg-slate-800" src="${imgSrc}" onerror="this.src='https://via.placeholder.com/100/131a2c/ffffff?text=${cleanCode}'">
+                        </td>
+                        <td class="py-3 px-4 font-semibold text-slate-200">
+                            ${vendedor.name} <span class="text-xs text-slate-500">(Cod: ${cleanCode})</span>
+                        </td>
+                        <!-- NOVO: Exibe o nome do supervisor do vendedor na coluna -->
+                        <td class="py-3 px-4 font-medium text-slate-400">
+                            ${vendedor.supervisor}
+                        </td>
+                        <td class="py-3 px-4 text-right font-bold text-vieiraYellow text-md">${Math.round(vendedor.mediaPositivacao)} Clientes</td>
+                        <td class="py-3 px-4 text-right font-semibold text-emerald-400">${formatCurrency(vendedor.mediaFaturamento)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // NOVAS FUNÇÕES: Geração de arquivos CSV e XLS dinâmicos para download direto pelo navegador
+        function exportRankingToCSV() {
+            if (currentRankingData.length === 0) return alert("Não há dados para exportar.");
+            
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // Garante acentuação correta em português (UTF-8 com BOM)
+            csvContent += "Posicao;Vendedor;Codigo;Supervisor;Media Positivacao (Clientes);Media Faturamento (R$)\n";
+
+            currentRankingData.forEach((v, index) => {
+                const pos = index + 1;
+                const fatFormated = v.mediaFaturamento.toFixed(2).replace('.', ',');
+                const posFormated = Math.round(v.mediaPositivacao);
+                csvContent += `${pos};"${v.name}";"${v.cod}";"${v.supervisor}";${posFormated};${fatFormated}\n`;
+            });
+
+            const selectedMonth = document.getElementById('ranking-filter-mes').value || "Geral";
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Ranking_Vendedores_Medias_${selectedMonth}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function exportRankingToXLS() {
+            if (currentRankingData.length === 0) return alert("Não há dados para exportar.");
+
+            let htmlTable = `
+                <table border="1">
+                    <tr style="background-color: #ED1C24; color: #FFFFFF; font-weight: bold;">
+                        <th>Posição</th>
+                        <th>Vendedor</th>
+                        <th>Código</th>
+                        <th>Supervisor</th>
+                        <th>Média de Positivação (Clientes)</th>
+                        <th>Média de Faturamento Líquido (R$)</th>
+                    </tr>
+            `;
+
+            currentRankingData.forEach((v, index) => {
+                const pos = index + 1;
+                htmlTable += `
+                    <tr>
+                        <td>${pos}</td>
+                        <td>${v.name}</td>
+                        <td>${v.cod}</td>
+                        <td>${v.supervisor}</td>
+                        <td>${Math.round(v.mediaPositivacao)}</td>
+                        <td>${v.mediaFaturamento.toFixed(2).replace('.', ',')}</td>
+                    </tr>
+                `;
+            });
+
+            htmlTable += "</table>";
+
+            const blob = new Blob([htmlTable], { type: "application/vnd.ms-excel" });
+            const link = document.createElement("a");
+            const selectedMonth = document.getElementById('ranking-filter-mes').value || "Geral";
+            link.href = URL.createObjectURL(blob);
+            link.download = `Ranking_Vendedores_Medias_${selectedMonth}.xls`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function openGlobalRankingModal() {
+            const lateralMonth = document.getElementById('filter-mes').value;
+            document.getElementById('ranking-filter-mes').value = lateralMonth;
+
+            buildGlobalRankingTable();
+            document.getElementById('global-ranking-modal').classList.remove('hidden');
+        }
+
+        function renderTopProdutos(filteredData) {
+            let prodMesData = {};
+            filteredData.forEach(item => {
+                const prod = item.Produto;
+                const cod = item.CodigoProduto;
+                const mes = item.Mês;
+                const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
+                const cliente = item.Cliente || "";
+
+                if (!prod) return;
+                if (!prodMesData[prod]) prodMesData[prod] = { cod: cod, meses: {} };
+                if (!prodMesData[prod].meses[mes]) prodMesData[prod].meses[mes] = { fat: 0, clientes: new Set() };
+
+                prodMesData[prod].meses[mes].fat += vLiquida;
+                if (cliente && vLiquida > 0) prodMesData[prod].meses[mes].clientes.add(cliente);
+            });
+
+            let prodPerformance = [];
+            Object.entries(prodMesData).forEach(([prod, info]) => {
+                const mesesAtivos = Object.keys(info.meses).sort((a, b) => mesesOrdem.indexOf(a) - mesesOrdem.indexOf(b));
+                const totalMeses = mesesAtivos.length || 1;
+
+                let totalFat = 0, totalClientes = 0;
+                mesesAtivos.forEach(m => {
+                    totalFat += info.meses[m].fat;
+                    totalClientes += info.meses[m].clientes.size;
+                });
+
+                const mediaFat = totalFat / totalMeses;
+                const mediaPos = totalClientes / totalMeses;
+
+                let growth = 0;
+                if (mesesAtivos.length >= 2) {
+                    const indexUlt = (mesesAtivos[mesesAtivos.length - 1] === "Julho") ? mesesAtivos.length - 2 : mesesAtivos.length - 1;
+                    if (indexUlt > 0) {
+                        const ult = mesesAtivos[indexUlt];
+                        const pen = mesesAtivos[indexUlt - 1];
+                        growth = calcGrowth(info.meses[ult].fat, info.meses[pen].fat);
+                    }
+                }
+
+                prodPerformance.push({ name: prod, cod: info.cod, mediaFat, mediaPos, growth });
+            });
+
+            prodPerformance.sort((a, b) => b.mediaFat - a.mediaFat);
+            const top5 = prodPerformance.slice(0, 5);
+
+            const tbody = document.getElementById('table-produtos');
+            tbody.innerHTML = top5.map(p => {
+                const imgPath = p.cod ? `${p.cod}.png` : 'placeholder.png';
+                const trendColor = p.growth >= 0 ? 'text-emerald-400' : 'text-rose-500';
+                const trendIcon = p.growth >= 0 ? '▲' : '▼';
+
+                return `
+                    <tr onclick="openProductModal('${p.name}', '${p.cod}')" class="border-b border-slate-800 hover:bg-slate-800/40 transition cursor-pointer">
+                        <td class="py-2 flex items-center gap-2">
+                            <img src="Imagens_produtos/${imgPath}" class="h-8 w-8 rounded object-cover bg-white" onerror="this.src='https://via.placeholder.com/50?text=DV'">
+                            <span class="font-medium text-slate-200 truncate max-w-[150px] underline decoration-dotted">${p.name}</span>
+                        </td>
+                        <td class="py-2 text-right font-semibold text-white">${formatCurrency(p.mediaFat)}</td>
+                        <td class="py-2 text-right text-slate-300">${Math.round(p.mediaPos)} Clt/Mês</td>
+                        <td class="py-2 text-right font-bold ${trendColor}">${trendIcon} ${Math.abs(p.growth).toFixed(1)}%</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function generateTeamHTML(supName) {
+            const data = globalData.filter(i => i.Supervisor === supName);
+            let vendMesData = {};
+
+            data.forEach(item => {
+                const ven = item.Vendedor;
+                const cod = item.CodigoVendedor;
+                const mes = item.Mês;
+                const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
+                const cliente = item.Cliente || "";
+
+                if (!ven) return;
+                if (!vendMesData[ven]) vendMesData[ven] = { cod: cod, meses: {} };
+                if (!vendMesData[ven].meses[mes]) vendMesData[ven].meses[mes] = { fat: 0, clientes: new Set() };
+
+                vendMesData[ven].meses[mes].fat += vLiquida;
+                if (cliente && vLiquida > 0) vendMesData[ven].meses[mes].clientes.add(cliente);
+            });
+
+            const sortedTeam = Object.entries(vendMesData).map(([name, info]) => {
+                const mesesAtivos = Object.keys(info.meses).sort((a, b) => mesesOrdem.indexOf(a) - mesesOrdem.indexOf(b));
+                const totalMeses = mesesAtivos.length || 1;
+
+                let somaFat = 0, somaPos = 0;
+                mesesAtivos.forEach(m => {
+                    somaFat += info.meses[m].fat;
+                    somaPos += info.meses[m].clientes.size;
+                });
+
+                const mediaFat = somaFat / totalMeses;
+                const mediaPos = Math.round(somaPos / totalMeses);
+
+                let growthFat = 0;
+                if (mesesAtivos.length >= 2) {
+                    const indexUlt = (mesesAtivos[mesesAtivos.length - 1] === "Julho") ? mesesAtivos.length - 2 : mesesAtivos.length - 1;
+                    if (indexUlt > 0) {
+                        const ult = mesesAtivos[indexUlt];
+                        const pen = mesesAtivos[indexUlt - 1];
+                        growthFat = calcGrowth(info.meses[ult].fat, info.meses[pen].fat);
+                    }
+                }
+
+                return { name, info, mediaFat, mediaPos, growthFat };
+            }).sort((a, b) => b.mediaFat - a.mediaFat);
+
+            return sortedTeam.map(member => {
+                const trendFatColor = member.growthFat >= 0 ? 'text-emerald-400' : 'text-rose-500';
+                const cleanCode = String(member.info.cod).trim();
+                const imgSrc = `Imagens_Vendedores/${cleanCode}.png`;
+
+                return `
+                    <div class="flex items-center gap-4 bg-darkBg border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
+                        <img class="h-14 w-14 rounded-full object-cover border-2 border-slate-700 bg-slate-800" src="${imgSrc}" onerror="this.src='https://via.placeholder.com/100/131a2c/ffffff?text=${cleanCode}'">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-xs font-bold text-white truncate">${member.name} <span class="text-[10px] text-slate-500">(Cod: ${cleanCode})</span></h4>
+                            <div class="grid grid-cols-2 gap-2 mt-1 text-[11px] text-slate-300">
+                                <div>
+                                    <p class="text-slate-400 uppercase text-[9px]">Fat. Médio</p>
+                                    <p class="font-semibold">${formatCurrency(member.mediaFat)} <span class="${trendFatColor} text-[10px] ml-1 font-bold">${member.growthFat >= 0 ? '▲' : '▼'} ${Math.abs(member.growthFat).toFixed(1)}%</span></p>
+                                </div>
+                                <div>
+                                    <p class="text-slate-400 uppercase text-[9px]">Posit. Média</p>
+                                    <p class="font-semibold">${member.mediaPos} Clt/Mês</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openTeam(supName) {
+            document.getElementById('team-modal-title').innerText = `Equipe de Vendas - ${supName}`;
+            const container = document.getElementById('team-list');
+            container.innerHTML = generateTeamHTML(supName);
+            document.getElementById('team-modal').classList.remove('hidden');
+        }
+
+        function renderChart(meses, dados) {
+            const ctx = document.getElementById('chart-evolucao').getContext('2d');
+            if (myChart) myChart.destroy();
+
+            const datasetFaturamento = meses.map(m => dados[m].fatLiquido);
+            const datasetPositivacao = meses.map(m => dados[m].clientes.size);
+
+            myChart = new Chart(ctx, {
+                data: {
+                    labels: meses,
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: 'Fat. Líquido (R$)',
+                            data: datasetFaturamento,
+                            borderColor: '#ED1C24',
+                            borderWidth: 3,
+                            yAxisID: 'yFat'
+                        },
+                        {
+                            type: 'bar',
+                            label: 'Clientes Positivados',
+                            data: datasetPositivacao,
+                            backgroundColor: 'rgba(251, 191, 36, 0.4)',
+                            yAxisID: 'yPos'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        yFat: { type: 'linear', position: 'left', grid: { color: '#1e293b' } },
+                        yPos: { type: 'linear', position: 'right', grid: { drawOnChartArea: false } }
+                    }
+                }
+            });
+        }
+
+        function calcGrowth(atual, anterior) {
+            if (!anterior || anterior === 0) return 0;
+            return ((atual - anterior) / anterior) * 100;
+        }
+
+        function setMomUI(id, val, reverse = false, mesRef = '') {
+            const el = document.getElementById(id);
+            const color = val >= 0 ? (reverse ? 'text-rose-500' : 'text-emerald-400') : (reverse ? 'text-emerald-400' : 'text-rose-500');
+            const icon = val >= 0 ? '▲' : '▼';
+            el.innerHTML = `MoM (${mesRef}): <span class="${color} font-bold">${icon} ${Math.abs(val).toFixed(1)}%</span>`;
+        }
+
+        function renderCidadesTable(elementId, dataset) {
+            const sorted = Object.entries(dataset).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            const tbody = document.getElementById(elementId);
+            
+            tbody.innerHTML = sorted.map(([name, val]) => `
+                <tr onclick="filterByCity('${name}')" class="border-b border-slate-800 hover:bg-slate-800/40 transition cursor-pointer">
+                    <td class="py-2.5 font-medium text-slate-200 max-w-[200px] truncate hover:text-vieiraYellow">${name}</td>
+                    <td class="py-2.5 text-right font-semibold text-white">${formatCurrency(val)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function filterByCity(cityName) {
+            const select = document.getElementById('filter-cidade') || document.createElement('select');
+            select.value = cityName;
+            updateDashboard();
+        }
+
+        function renderSupervisors(filteredData) {
+            const container = document.getElementById('supervisors-grid');
+            container.innerHTML = "";
+
+            let supData = {};
+            filteredData.forEach(item => {
+                const sup = item.Supervisor;
+                const cod = item.CodigoSupervisor || "";
+                if (!sup) return;
+
+                if (!supData[sup]) {
+                    supData[sup] = { fat: 0, pos: new Set(), cod: cod };
+                }
+                supData[sup].fat += parseFloat(item.FaturamentoLiquido || 0);
+                if (item.Cliente) supData[sup].pos.add(item.Cliente);
+            });
+
+            Object.entries(supData).forEach(([name, info]) => {
+                const cleanCode = String(info.cod).trim();
+                const imgSrc = `Imagens_Supervisores/${cleanCode}.png`;
+
+                container.innerHTML += `
+                    <div class="bg-darkBg border border-slate-800 p-4 rounded-xl flex items-center gap-4 hover:border-vieiraYellow/50 transition">
+                        <img onclick="openSupervisorDetails('${name}', '${cleanCode}')" class="h-16 w-16 rounded-full object-cover border-2 border-slate-700 hover:border-vieiraYellow cursor-pointer bg-slate-800" src="${imgSrc}" onerror="this.src='https://via.placeholder.com/150/131a2c/ffffff?text=${name.substring(0,1)}'">
+                        <div class="flex-1">
+                            <h4 class="text-sm font-bold text-white">${name}</h4>
+                            <p class="text-xs text-slate-400 mt-0.5">${formatCurrency(info.fat)}</p>
+                            <div class="flex gap-2 mt-2">
+                                <button onclick="openSupervisorDetails('${name}', '${cleanCode}')" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded text-slate-200">Desempenho</button>
+                                <button onclick="openTeam('${name}')" class="text-[10px] bg-vieiraRed hover:bg-red-700 px-2.5 py-1 rounded text-white font-semibold">Exibir Equipe</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function openSupervisorDetails(supName, supCod) {
+            const data = globalData.filter(i => i.Supervisor === supName);
+            let mensal = {};
+
+            data.forEach(item => {
+                const mes = item.Mês;
+                const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
+                const cl = item.Cliente;
+
+                if (!mensal[mes]) {
+                    mensal[mes] = { fat: 0, pos: new Set() };
+                }
+                mensal[mes].fat += vLiquida;
+                if (cl && vLiquida > 0) mensal[mes].pos.add(cl);
+            });
+
+            const mesesAtivosList = Object.keys(mensal);
+            const totalSupervisorMeses = mesesAtivosList.length || 1;
+
+            let somaFat = 0;
+            let somaPos = 0;
+            mesesAtivosList.forEach(m => {
+                somaFat += mensal[m].fat;
+                somaPos += mensal[m].pos.size;
+            });
+
+            const mediaFat = somaFat / totalSupervisorMeses;
+            const mediaPos = Math.round(somaPos / totalSupervisorMeses);
+
+            document.getElementById('sup-modal-name').innerText = supName;
+            document.getElementById('sup-modal-fat').innerText = formatCurrency(mediaFat);
+            document.getElementById('sup-modal-pos').innerText = `${mediaPos} Clientes/Mês`;
+
+            const cleanCode = String(supCod).trim();
+            document.getElementById('sup-modal-img').src = `Imagens_Supervisores/${cleanCode}.png`;
+
+            const list = document.getElementById('sup-modal-mom-list');
+            list.innerHTML = "";
+            const mesesAtivos = Object.keys(mensal).sort((a, b) => mesesOrdem.indexOf(a) - mesesOrdem.indexOf(b));
+
+            for (let i = 0; i < mesesAtivos.length; i++) {
+                const mes = mesesAtivos[i];
+                let growthTxt = "Primeiro Mês";
+                if (i > 0) {
+                    const ant = mesesAtivos[i-1];
+                    const grow = calcGrowth(mensal[mes].fat, mensal[ant].fat);
+                    growthTxt = `MoM: ${grow >= 0 ? '▲' : '▼'} ${Math.abs(grow).toFixed(1)}%`;
+                }
+                list.innerHTML += `
+                    <div class="flex justify-between text-xs border-b border-slate-800 py-1.5">
+                        <span class="text-slate-300 font-medium">${mes}</span>
+                        <span class="text-slate-400">${formatCurrency(mensal[mes].fat)}</span>
+                        <span class="${growthTxt.includes('▲') ? 'text-emerald-400' : 'text-slate-500'} font-bold">${growthTxt}</span>
+                    </div>
+                `;
+            }
+
+            const teamContainer = document.getElementById('sup-modal-team-list');
+            teamContainer.innerHTML = generateTeamHTML(supName);
+
+            document.getElementById('supervisor-modal').classList.remove('hidden');
+        }
+
+        function openProductModal(prodName, prodCod) {
+            const data = globalData.filter(i => i.Produto === prodName);
+            let mensal = {};
+
+            data.forEach(item => {
+                const mes = item.Mês;
+                const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
+                const cl = item.Cliente;
+
+                if (!mensal[mes]) {
+                    mensal[mes] = { fat: 0, pos: new Set() };
+                }
+                mensal[mes].fat += vLiquida;
+                if (cl && vLiquida > 0) mensal[mes].pos.add(cl);
+            });
+
+            const totalFat = Object.values(mensal).reduce((acc, m) => acc + m.fat, 0);
+            const clPositivados = new Set(data.filter(i => parseFloat(i.FaturamentoLiquido) > 0).map(i => i.Cliente));
+
+            document.getElementById('prod-modal-name').innerText = prodName;
+            document.getElementById('prod-modal-code').innerText = `Código: ${prodCod}`;
+            document.getElementById('prod-modal-fat').innerText = formatCurrency(totalFat);
+            document.getElementById('prod-modal-pos').innerText = `${clPositivados.size} Clientes`;
+
+            const cleanCod = String(prodCod).trim();
+            document.getElementById('prod-modal-img').src = `Imagens_produtos/${cleanCod}.png`;
+
+            const list = document.getElementById('prod-modal-mom-list');
+            list.innerHTML = "";
+            const mesesAtivos = Object.keys(mensal).sort((a, b) => mesesOrdem.indexOf(a) - mesesOrdem.indexOf(b));
+
+            for (let i = 0; i < mesesAtivos.length; i++) {
+                const mes = mesesAtivos[i];
+                let growthTxt = "Primeiro Mês";
+                if (i > 0) {
+                    const ant = mesesAtivos[i-1];
+                    const grow = calcGrowth(mensal[mes].fat, mensal[ant].fat);
+                    growthTxt = `MoM: ${grow >= 0 ? '▲' : '▼'} ${Math.abs(grow).toFixed(1)}%`;
+                }
+                list.innerHTML += `
+                    <div class="flex justify-between text-xs border-b border-slate-800 py-1.5">
+                        <span class="text-slate-300 font-medium">${mes}</span>
+                        <span class="text-slate-400">${formatCurrency(mensal[mes].fat)}</span>
+                        <span class="${growthTxt.includes('▲') ? 'text-emerald-400' : 'text-slate-500'} font-bold">${growthTxt}</span>
+                    </div>
+                `;
+            }
+
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        // Formatação simples e limpa para moeda BRL
+        function formatCurrency(val) {
+            return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function clearFilters() {
+            document.getElementById('filter-ano').value = "";
+            document.getElementById('filter-mes').value = "";
+            document.getElementById('filter-supervisor').value = "";
+            document.getElementById('filter-vendedor').value = "";
+            updateDashboard();
+        }
+    </script>
+</body>
+</html>
