@@ -31,7 +31,7 @@
     <!-- HEADER INSTITUCIONAL -->
     <header class="bg-vieiraRed p-4 shadow-lg flex justify-between items-center border-b-4 border-vieiraYellow">
         <div class="flex items-center gap-4">
-            <img src="logo-doces-vieira.png" alt="Doces Vieira" class="h-12 object-contain bg-white p-1 rounded">
+            <img src="logo-doces-vieira.png" alt="Doces Vieira" class="h-12 object-contain bg-white p-1 rounded" onerror="this.style.display='none'">
             <div>
                 <h1 class="text-xl font-bold text-white tracking-wide">Decisões que Geram Valor</h1>
                 <p class="text-xs text-white/80">Dashboard de Acompanhamento Mensal & Performance Comercial</p>
@@ -43,9 +43,9 @@
     </header>
 
     <!-- CONTAINER PRINCIPAL -->
-    <main class="p-6 max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-5 gap-6">
+    <main class="p-6 max-w-[1700px] mx-auto grid grid-cols-1 lg:grid-cols-5 gap-6">
         
-        <!-- FILTROS LATERAIS -->
+        <!-- FILTROS LATERAIS MULTIPLOS -->
         <section class="lg:col-span-1 bg-darkCard p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
             <div>
                 <div class="flex justify-between items-center mb-6">
@@ -53,25 +53,32 @@
                     <button onclick="clearFilters()" class="text-xs text-slate-400 hover:text-vieiraRed transition">Limpar Tudo</button>
                 </div>
                 
-                <div class="space-y-4">
+                <div class="space-y-4 text-xs">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Ano</label>
-                        <select id="filter-ano" onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-vieiraRed outline-none"></select>
+                        <label class="block text-slate-400 mb-1">Ano (Múltiplo)</label>
+                        <select id="filter-ano" multiple onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-slate-200 focus:border-vieiraRed outline-none h-20 custom-multiselect"></select>
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Mês</label>
-                        <select id="filter-mes" onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-vieiraRed outline-none"></select>
+                        <label class="block text-slate-400 mb-1">Mês (Múltiplo)</label>
+                        <select id="filter-mes" multiple onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-slate-200 focus:border-vieiraRed outline-none h-24 custom-multiselect"></select>
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Supervisor</label>
-                        <select id="filter-supervisor" onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-vieiraRed outline-none"></select>
+                        <label class="block text-slate-400 mb-1">Supervisor (Múltiplo)</label>
+                        <select id="filter-supervisor" multiple onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-slate-200 focus:border-vieiraRed outline-none h-24 custom-multiselect"></select>
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Vendedor</label>
-                        <select id="filter-vendedor" onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-vieiraRed outline-none"></select>
+                        <label class="block text-slate-400 mb-1">Vendedor (Múltiplo)</label>
+                        <select id="filter-vendedor" multiple onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-slate-200 focus:border-vieiraRed outline-none h-24 custom-multiselect"></select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">Cidade (Múltiplo)</label>
+                        <select id="filter-cidade" multiple onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-slate-200 focus:border-vieiraRed outline-none h-24 custom-multiselect"></select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">Produto (Múltiplo)</label>
+                        <select id="filter-produto" multiple onchange="updateDashboard()" class="w-full bg-darkBg border border-slate-700 rounded-lg p-2 text-slate-200 focus:border-vieiraRed outline-none h-24 custom-multiselect"></select>
                     </div>
                     
-                    <!-- Botão de ranking posicionado exatamente abaixo do último filtro de vendedor -->
                     <div class="pt-4 border-t border-slate-800">
                         <button onclick="openGlobalRankingModal()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-slate-900 font-bold py-3 px-4 rounded-xl shadow-lg hover:shadow-yellow-500/10 transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-wider">
                             <i class="fa-solid fa-trophy text-sm"></i> Acessar Ranking Geral
@@ -85,26 +92,31 @@
         <section class="lg:col-span-4 space-y-6">
             
             <!-- KPIs COM MÉDIAS E MoM -->
-            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                <div class="bg-darkCard p-4 rounded-xl border-l-4 border-vieiraRed shadow">
-                    <p class="text-xs text-slate-400 font-medium uppercase">Média Fat. Líquido</p>
-                    <p id="kpi-faturamento" class="text-2xl font-bold mt-1 text-white">R$ 0,00</p>
-                    <span id="mom-faturamento" class="text-xs font-semibold block mt-1 text-slate-400">MoM: --</span>
+            <div class="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                <div class="bg-darkCard p-3.5 rounded-xl border-l-4 border-vieiraRed shadow">
+                    <p class="text-[10px] text-slate-400 font-medium uppercase">Média Fat. Líquido</p>
+                    <p id="kpi-faturamento" class="text-xl font-bold mt-1 text-white">R$ 0,00</p>
+                    <span id="mom-faturamento" class="text-[11px] font-semibold block mt-1 text-slate-400">MoM: --</span>
                 </div>
-                <div class="bg-darkCard p-4 rounded-xl border-l-4 border-vieiraYellow shadow">
-                    <p class="text-xs text-slate-400 font-medium uppercase">Média Posit. Líquida</p>
-                    <p id="kpi-positivacao" class="text-2xl font-bold mt-1 text-white">0 Clientes</p>
-                    <span id="mom-positivacao" class="text-xs font-semibold block mt-1 text-slate-400">MoM: --</span>
+                <div class="bg-darkCard p-3.5 rounded-xl border-l-4 border-vieiraYellow shadow">
+                    <p class="text-[10px] text-slate-400 font-medium uppercase">Média Posit. Líquida</p>
+                    <p id="kpi-positivacao" class="text-xl font-bold mt-1 text-white">0 Clientes</p>
+                    <span id="mom-positivacao" class="text-[11px] font-semibold block mt-1 text-slate-400">MoM: --</span>
                 </div>
-                <div class="bg-darkCard p-4 rounded-xl border-l-4 border-emerald-500 shadow">
-                    <p class="text-xs text-slate-400 font-medium uppercase">Média Vendas Brutas</p>
-                    <p id="kpi-brutas" class="text-2xl font-bold mt-1 text-emerald-400">R$ 0,00</p>
-                    <span id="mom-brutas" class="text-xs font-semibold block mt-1 text-slate-400">MoM: --</span>
+                <div class="bg-darkCard p-3.5 rounded-xl border-l-4 border-emerald-500 shadow">
+                    <p class="text-[10px] text-slate-400 font-medium uppercase">Média Vendas Brutas</p>
+                    <p id="kpi-brutas" class="text-xl font-bold mt-1 text-emerald-400">R$ 0,00</p>
+                    <span id="mom-brutas" class="text-[11px] font-semibold block mt-1 text-slate-400">MoM: --</span>
                 </div>
-                <div class="bg-darkCard p-4 rounded-xl border-l-4 border-amber-600 shadow">
-                    <p class="text-xs text-slate-400 font-medium uppercase">Ticket Médio / Clt</p>
-                    <p id="kpi-ticket" class="text-2xl font-bold mt-1 text-amber-500">R$ 0,00</p>
-                    <span id="mom-ticket" class="text-xs font-semibold block mt-1 text-slate-400">MoM: --</span>
+                <div class="bg-darkCard p-3.5 rounded-xl border-l-4 border-amber-600 shadow">
+                    <p class="text-[10px] text-slate-400 font-medium uppercase">Ticket Médio / Clt</p>
+                    <p id="kpi-ticket" class="text-xl font-bold mt-1 text-amber-500">R$ 0,00</p>
+                    <span id="mom-ticket" class="text-[11px] font-semibold block mt-1 text-slate-400">MoM: --</span>
+                </div>
+                <div class="bg-darkCard p-3.5 rounded-xl border-l-4 border-sky-500 shadow">
+                    <p class="text-[10px] text-slate-400 font-medium uppercase">Média Qtd. (Potes/Disp)</p>
+                    <p id="kpi-qtd" class="text-xl font-bold mt-1 text-sky-400">0 Unid.</p>
+                    <span id="mom-qtd" class="text-[11px] font-semibold block mt-1 text-slate-400">MoM: --</span>
                 </div>
             </div>
 
@@ -116,9 +128,8 @@
                 </div>
             </div>
 
-            <!-- TABELAS E GRÁFICOS -->
+            <!-- TABELAS TOP 5 -->
             <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                <!-- Top Produtos -->
                 <div class="bg-darkCard p-4 rounded-xl border border-slate-800">
                     <h3 class="text-sm font-bold text-vieiraYellow mb-3 flex items-center gap-2">📦 Top 5 Produtos Mais Vendidos</h3>
                     <div class="overflow-x-auto">
@@ -128,6 +139,7 @@
                                     <th class="py-2">PRODUTO</th>
                                     <th class="py-2 text-right">MÉDIA FAT.</th>
                                     <th class="py-2 text-right">MÉDIA POSIT.</th>
+                                    <th class="py-2 text-right">MÉDIA QTD.</th>
                                     <th class="py-2 text-right">MoM %</th>
                                 </tr>
                             </thead>
@@ -136,7 +148,6 @@
                     </div>
                 </div>
 
-                <!-- Top Cidades -->
                 <div class="bg-darkCard p-4 rounded-xl border border-slate-800">
                     <h3 class="text-sm font-bold text-vieiraYellow mb-3 flex items-center gap-2">📍 Top 5 Cidades por Performance</h3>
                     <div class="overflow-x-auto">
@@ -144,7 +155,10 @@
                             <thead>
                                 <tr class="border-b border-slate-700 text-slate-400">
                                     <th class="py-2">CIDADE</th>
-                                    <th class="py-2 text-right">FATURAMENTO</th>
+                                    <th class="py-2 text-right">MÉDIA FAT.</th>
+                                    <th class="py-2 text-right">MÉDIA POSIT.</th>
+                                    <th class="py-2 text-right">MÉDIA QTD.</th>
+                                    <th class="py-2 text-right">MoM % (FAT)</th>
                                 </tr>
                             </thead>
                             <tbody id="table-cidades"></tbody>
@@ -162,7 +176,7 @@
         </section>
     </main>
 
-    <!-- MODAL DE DETALHES DE PERFORMANCE DO PRODUTO -->
+    <!-- MODAIS DA APLICAÇÃO -->
     <div id="product-modal" class="fixed inset-0 bg-black/85 flex items-center justify-center hidden z-50">
         <div class="bg-darkCard border border-slate-700 p-6 rounded-2xl max-w-lg w-full relative mx-4">
             <button onclick="closeModal('product-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -188,29 +202,18 @@
         </div>
     </div>
 
-    <!-- MODAL DE DETALHES DE PERFORMANCE DO SUPERVISOR (AJUSTADO E TOTALMENTE RESPONSIVO) -->
     <div id="supervisor-modal" class="fixed inset-0 bg-black/85 flex items-center justify-center hidden z-50 p-2 sm:p-4">
         <div class="bg-darkCard border border-slate-700 p-4 sm:p-6 rounded-2xl max-w-5xl w-full relative mx-auto flex flex-col max-h-[90vh] overflow-y-auto shadow-2xl">
-            
-            <!-- Botão de fechar otimizado para Mobile (Mais fácil de clicar no canto superior direito) -->
-            <button onclick="closeModal('supervisor-modal')" class="absolute top-3 right-3 sm:top-4 sm:right-4 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 h-10 w-10 flex items-center justify-center rounded-full transition z-10">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            
-            <!-- Conteúdo em Grid (1 coluna no mobile e 2 no computador) -->
+            <button onclick="closeModal('supervisor-modal')" class="absolute top-3 right-3 sm:top-4 sm:right-4 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 h-10 w-10 flex items-center justify-center rounded-full transition z-10"><i class="fa-solid fa-xmark text-lg"></i></button>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 pt-4">
-                
-                <!-- COLUNA ESQUERDA: PERFORMANCE DO SUPERVISOR -->
                 <div class="space-y-4">
                     <div class="flex items-center gap-4">
-                        <!-- shrink-0 impede o navegador de esmagar a imagem do supervisor no mobile -->
                         <img id="sup-modal-img" class="h-16 w-16 rounded-full object-cover border-2 border-vieiraYellow bg-slate-800 shrink-0" src="" alt="" onerror="this.src='https://via.placeholder.com/150/131a2c/ffffff?text=S'">
                         <div>
                             <h3 id="sup-modal-name" class="text-base sm:text-lg font-bold text-white leading-tight">Supervisor</h3>
                             <p class="text-[11px] sm:text-xs text-slate-400">Análise Consolidada de Performance</p>
                         </div>
                     </div>
-                    
                     <div class="grid grid-cols-2 gap-3 sm:gap-4">
                         <div class="bg-darkBg p-3 rounded-xl border border-slate-800">
                             <p class="text-[10px] text-slate-400 uppercase tracking-wide">Faturamento Médio</p>
@@ -221,28 +224,19 @@
                             <p id="sup-modal-pos" class="text-sm sm:text-base font-extrabold text-white">0 Clientes</p>
                         </div>
                     </div>
-                    
                     <div>
                         <h4 class="text-xs font-bold text-vieiraYellow uppercase tracking-wider mb-2">Evolução Mensal (MoM)</h4>
                         <div id="sup-modal-mom-list" class="space-y-1.5 max-h-40 sm:max-h-56 overflow-y-auto pr-2 bg-darkBg/50 p-2.5 rounded-xl border border-slate-800"></div>
                     </div>
                 </div>
-                
-                <!-- COLUNA DIREITA: EQUIPE DE VENDEDORES ASSOCIADOS (RANKING INTEGRADO) -->
                 <div class="border-t md:border-t-0 md:border-l border-slate-800 pt-5 md:pt-0 md:pl-6 flex flex-col min-h-0">
-                    <h3 class="text-xs sm:text-sm font-bold text-vieiraYellow uppercase mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-users"></i> Ranking da Equipe de Vendas
-                    </h3>
-                    <div id="sup-modal-team-list" class="space-y-2.5 overflow-y-auto pr-2 flex-1 max-h-[300px] md:max-h-[380px]">
-                        <p class="text-xs text-slate-400">Carregando equipe...</p>
-                    </div>
+                    <h3 class="text-xs sm:text-sm font-bold text-vieiraYellow uppercase mb-3 flex items-center gap-2"><i class="fa-solid fa-users"></i> Ranking da Equipe de Vendas</h3>
+                    <div id="sup-modal-team-list" class="space-y-2.5 overflow-y-auto pr-2 flex-1 max-h-[300px] md:max-h-[380px]"></div>
                 </div>
-                
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE EXIBIÇÃO DE EQUIPE (MANTIDO INDEPENDENTE) -->
     <div id="team-modal" class="fixed inset-0 bg-black/85 flex items-center justify-center hidden z-50">
         <div class="bg-darkCard border border-slate-700 p-6 rounded-2xl max-w-2xl w-full relative mx-4">
             <button onclick="closeModal('team-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -251,9 +245,8 @@
         </div>
     </div>
 
-    <!-- MODAL DE RANKING GERAL DE VENDEDORES -->
     <div id="global-ranking-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center hidden z-50 p-2 sm:p-4">
-        <div class="bg-darkCard border border-slate-700 p-4 sm:p-6 rounded-2xl max-w-[1100px] w-full relative mx-auto flex flex-col h-[85vh]">
+        <div class="bg-darkCard border border-slate-700 p-4 sm:p-6 rounded-2xl max-w-[1200px] w-full relative mx-auto flex flex-col h-[85vh]">
             <button onclick="closeModal('global-ranking-modal')" class="absolute top-3 right-3 sm:top-4 sm:right-4 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 h-10 w-10 flex items-center justify-center rounded-full transition z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
             
             <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4 md:pt-0">
@@ -265,13 +258,11 @@
                     </div>
                 </div>
                 
-                <!-- Filtro de Mês e botões de exportação -->
                 <div class="flex flex-wrap items-center gap-3">
                     <div class="flex items-center gap-2">
                         <label class="text-xs text-slate-400 whitespace-nowrap">Filtrar por Mês:</label>
                         <select id="ranking-filter-mes" onchange="buildGlobalRankingTable()" class="bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-vieiraRed outline-none min-w-[150px]"></select>
                     </div>
-                    
                     <div class="flex gap-1.5">
                         <button onclick="exportRankingToCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold py-2 px-3 rounded-lg text-xs flex items-center gap-1.5 transition">
                             <i class="fa-solid fa-file-csv text-emerald-400"></i> Exportar CSV
@@ -293,13 +284,12 @@
                                 <th class="py-3 px-4">Vendedor</th>
                                 <th class="py-3 px-4">Supervisor</th>
                                 <th class="py-3 px-4 text-right">Média Positivação</th>
+                                <th class="py-3 px-4 text-right">Média Qtd. Vendida</th>
                                 <th id="ranking-header-campanha" class="py-3 px-4 text-center hidden">Campanha 🎯</th>
                                 <th class="py-3 px-4 text-right">Média Fat. Líquido</th>
                             </tr>
                         </thead>
-                        <tbody id="global-ranking-body" class="divide-y divide-slate-800">
-                            <!-- Conteúdo populado dinamicamente -->
-                        </tbody>
+                        <tbody id="global-ranking-body" class="divide-y divide-slate-800"></tbody>
                     </table>
                 </div>
             </div>
@@ -314,16 +304,6 @@
         const mesesOrdem = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
         const mesesCampanha = ["Julho", "Agosto", "Setembro"];
 
-        function getSupervisorImg(name) {
-            if (!name) return 'https://via.placeholder.com/150/131a2c/ffffff?text=S';
-            const clean = name.toLowerCase()
-                              .normalize("NFD")
-                              .replace(/[\u0300-\u036f]/g, "") 
-                              .trim()
-                              .replace(/\s+/g, '_'); 
-            return `Imagens_Supervisores/${clean}.png`;
-        }
-
         document.addEventListener("DOMContentLoaded", () => {
             fetch('data.json?t=' + new Date().getTime())
                 .then(response => {
@@ -333,22 +313,56 @@
                 .then(data => {
                     globalData = data;
                     populateFilters();
+                    enableToggleMultiSelect();
                     updateDashboard();
                     populateRankingMonthFilter();
                 })
                 .catch(err => console.error("Erro na inicialização:", err));
         });
 
+        // Seleção flexível sem necessidade da tecla CTRL
+        function enableToggleMultiSelect() {
+            document.querySelectorAll('select.custom-multiselect').forEach(select => {
+                select.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    
+                    const option = e.target.closest('option');
+                    if (!option) return;
+
+                    option.selected = !option.selected;
+
+                    select.focus();
+                    select.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+            });
+        }
+
+        function getSelectValues(id) {
+            const select = document.getElementById(id);
+            if (!select) return [];
+            return Array.from(select.selectedOptions).map(option => option.value).filter(val => val !== "");
+        }
+
         function populateFilters() {
             const anos = [...new Set(globalData.map(item => item.Ano))].filter(Boolean);
             const meses = [...new Set(globalData.map(item => item.Mês))].filter(Boolean);
             const supervisores = [...new Set(globalData.map(item => item.Supervisor))].filter(Boolean);
             const vendedores = [...new Set(globalData.map(item => item.Vendedor))].filter(Boolean);
+            const cidades = [...new Set(globalData.map(item => item.Cidade))].filter(Boolean);
+            const produtos = [...new Set(globalData.map(item => item.Produto))].filter(Boolean);
 
             buildSelect('filter-ano', anos);
-            buildSelect('filter-mes', meses);
+            buildSelect('filter-mes', meses.sort((a, b) => mesesOrdem.indexOf(a) - mesesOrdem.indexOf(b)));
             buildSelect('filter-supervisor', supervisores);
             buildSelect('filter-vendedor', vendedores);
+            buildSelect('filter-cidade', cidades);
+            buildSelect('filter-produto', produtos);
+        }
+
+        function buildSelect(id, items) {
+            const select = document.getElementById(id);
+            if (!select) return;
+            select.innerHTML = items.map(item => `<option value="${item}">${item}</option>`).join('');
         }
 
         function populateRankingMonthFilter() {
@@ -361,29 +375,28 @@
                 mesesOrdenados.map(m => `<option value="${m}">${m}</option>`).join('');
         }
 
-        function buildSelect(id, items) {
-            const select = document.getElementById(id);
-            if (!select) return;
-            select.innerHTML = `<option value="">Todos</option>` + 
-                items.sort().map(item => `<option value="${item}">${item}</option>`).join('');
-        }
-
         function updateDashboard() {
-            const fAno = document.getElementById('filter-ano').value;
-            const fMes = document.getElementById('filter-mes').value;
-            const fSup = document.getElementById('filter-supervisor').value;
-            const fVen = document.getElementById('filter-vendedor').value;
+            const fAnos = getSelectValues('filter-ano');
+            const fMeses = getSelectValues('filter-mes');
+            const fSups = getSelectValues('filter-supervisor');
+            const fVens = getSelectValues('filter-vendedor');
+            const fCidades = getSelectValues('filter-cidade');
+            const fProds = getSelectValues('filter-produto');
 
             const filtered = globalData.filter(item => {
                 const ano = String(item.Ano || '');
                 const mes = String(item.Mês || '');
                 const sup = item.Supervisor || '';
                 const ven = item.Vendedor || '';
+                const cid = item.Cidade || '';
+                const prod = item.Produto || '';
 
-                return (!fAno || ano === fAno) &&
-                       (!fMes || mes === fMes) &&
-                       (!fSup || sup === fSup) &&
-                       (!fVen || ven === fVen);
+                return (fAnos.length === 0 || fAnos.includes(ano)) &&
+                       (fMeses.length === 0 || fMeses.includes(mes)) &&
+                       (fSups.length === 0 || fSups.includes(sup)) &&
+                       (fVens.length === 0 || fVens.includes(ven)) &&
+                       (fCidades.length === 0 || fCidades.includes(cid)) &&
+                       (fProds.length === 0 || fProds.includes(prod));
             });
 
             let mensalConsolidado = {};
@@ -392,330 +405,141 @@
                 const vBruta = parseFloat(item.VendaBruta || 0);
                 const dev = parseFloat(item.Devolucao || 0);
                 const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
+                const qtd = parseFloat(item.Qtd_Vendida || 0);
                 const cliente = item.Cliente || "";
 
                 if (!mensalConsolidado[mes]) {
-                    mensalConsolidado[mes] = { fatLiquido: 0, vendasBrutas: 0, devolucoes: 0, clientes: new Set() };
+                    mensalConsolidado[mes] = { fatLiquido: 0, vendasBrutas: 0, devolucoes: 0, qtd: 0, clientes: new Set() };
                 }
 
                 mensalConsolidado[mes].fatLiquido += vLiquida;
                 mensalConsolidado[mes].vendasBrutas += vBruta;
                 mensalConsolidado[mes].devolucoes += dev;
-                if (cliente && vLiquida > 0) {
-                    mensalConsolidado[mes].clientes.add(cliente);
-                }
+                mensalConsolidado[mes].qtd += qtd;
+                if (cliente && vLiquida > 0) mensalConsolidado[mes].clientes.add(cliente);
             });
 
             const mesesAtivos = Object.keys(mensalConsolidado).sort((a, b) => mesesOrdem.indexOf(a) - mesesOrdem.indexOf(b));
             const totalMeses = mesesAtivos.length || 1;
 
-            let somaFatLiquido = 0, somaVendasBrutas = 0, somaDevolucoes = 0, somaClientesPositivados = 0;
+            let somaFatLiquido = 0, somaVendasBrutas = 0, somaClientesPositivados = 0, somaQtd = 0;
             mesesAtivos.forEach(m => {
                 somaFatLiquido += mensalConsolidado[m].fatLiquido;
                 somaVendasBrutas += mensalConsolidado[m].vendasBrutas;
-                somaDevolucoes += mensalConsolidado[m].devolucoes;
                 somaClientesPositivados += mensalConsolidado[m].clientes.size;
+                somaQtd += mensalConsolidado[m].qtd;
             });
 
             const mediaFatLiquido = somaFatLiquido / totalMeses;
             const mediaVendasBrutas = somaVendasBrutas / totalMeses;
             const mediaClientesPositivados = Math.round(somaClientesPositivados / totalMeses);
+            const mediaQtd = Math.round(somaQtd / totalMeses);
             const mediaTicket = mediaClientesPositivados > 0 ? (mediaFatLiquido / mediaClientesPositivados) : 0;
 
             document.getElementById('kpi-faturamento').innerText = formatCurrency(mediaFatLiquido);
             document.getElementById('kpi-positivacao').innerText = `${mediaClientesPositivados} Clientes/Mês`;
             document.getElementById('kpi-brutas').innerText = formatCurrency(mediaVendasBrutas);
             document.getElementById('kpi-ticket').innerText = formatCurrency(mediaTicket);
+            document.getElementById('kpi-qtd').innerText = `${mediaQtd.toLocaleString('pt-BR')} Unid.`;
 
-            if (mesesAtivos.length >= 2) {
-                const mAtual = mesesAtivos[mesesAtivos.length - 1];
-                const isMesParcial = (mAtual === "Julho");
-                
-                const indexUlt = isMesParcial ? mesesAtivos.length - 2 : mesesAtivos.length - 1;
-                const indexPen = indexUlt - 1;
+            let mesReferencia = fMeses.length > 0 ? fMeses[fMeses.length - 1] : mesesAtivos[mesesAtivos.length - 1];
 
-                if (indexPen >= 0) {
-                    const ultMes = mesesAtivos[indexUlt];
-                    const penMes = mesesAtivos[indexPen];
+            const globalSemFiltroMes = globalData.filter(item => {
+                const ano = String(item.Ano || '');
+                const sup = item.Supervisor || '';
+                const ven = item.Vendedor || '';
+                const cid = item.Cidade || '';
+                const prod = item.Produto || '';
 
-                    const pctFat = calcGrowth(mensalConsolidado[ultMes].fatLiquido, mensalConsolidado[penMes].fatLiquido);
-                    const pctPos = calcGrowth(mensalConsolidado[ultMes].clientes.size, mensalConsolidado[penMes].clientes.size);
-                    const pctBruto = calcGrowth(mensalConsolidado[ultMes].vendasBrutas, mensalConsolidado[penMes].vendasBrutas);
-                    
-                    const ticketUlt = mensalConsolidado[ultMes].clientes.size > 0 ? (mensalConsolidado[ultMes].fatLiquido / mensalConsolidado[ultMes].clientes.size) : 0;
-                    const ticketPen = mensalConsolidado[penMes].clientes.size > 0 ? (mensalConsolidado[penMes].fatLiquido / mensalConsolidado[penMes].clientes.size) : 0;
-                    const pctTicket = calcGrowth(ticketUlt, ticketPen);
+                return (fAnos.length === 0 || fAnos.includes(ano)) &&
+                       (fSups.length === 0 || fSups.includes(sup)) &&
+                       (fVens.length === 0 || fVens.includes(ven)) &&
+                       (fCidades.length === 0 || fCidades.includes(cid)) &&
+                       (fProds.length === 0 || fProds.includes(prod));
+            });
 
-                    setMomUI('mom-faturamento', pctFat, false, ultMes);
-                    setMomUI('mom-positivacao', pctPos, false, ultMes);
-                    setMomUI('mom-brutas', pctBruto, false, ultMes);
-                    setMomUI('mom-ticket', pctTicket, false, ultMes);
+            let globalMensal = {};
+            globalSemFiltroMes.forEach(item => {
+                const mes = item.Mês || "Desconhecido";
+                const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
+                const vBruta = parseFloat(item.VendaBruta || 0);
+                const qtd = parseFloat(item.Qtd_Vendida || 0);
+                const cliente = item.Cliente || "";
+
+                if (!globalMensal[mes]) {
+                    globalMensal[mes] = { fatLiquido: 0, vendasBrutas: 0, qtd: 0, clientes: new Set() };
                 }
+                globalMensal[mes].fatLiquido += vLiquida;
+                globalMensal[mes].vendasBrutas += vBruta;
+                globalMensal[mes].qtd += qtd;
+                if (cliente && vLiquida > 0) globalMensal[mes].clientes.add(cliente);
+            });
+
+            const indexRef = mesesOrdem.indexOf(mesReferencia);
+            const mesesAnterioresList = Object.keys(globalMensal)
+                .filter(m => mesesOrdem.indexOf(m) < indexRef)
+                .sort((a, b) => mesesOrdem.indexOf(a) - mesesOrdem.indexOf(b));
+
+            if (mesesAnterioresList.length > 0 && globalMensal[mesReferencia]) {
+                let histFat = 0, histPos = 0, histBruto = 0, histQtd = 0, histTicket = 0;
+                
+                mesesAnterioresList.forEach(m => {
+                    histFat += globalMensal[m].fatLiquido;
+                    histPos += globalMensal[m].clientes.size;
+                    histBruto += globalMensal[m].vendasBrutas;
+                    histQtd += globalMensal[m].qtd;
+                    const t = globalMensal[m].clientes.size > 0 ? (globalMensal[m].fatLiquido / globalMensal[m].clientes.size) : 0;
+                    histTicket += t;
+                });
+
+                const countHist = mesesAnterioresList.length;
+                const mediaHistFat = histFat / countHist;
+                const mediaHistPos = histPos / countHist;
+                const mediaHistBruto = histBruto / countHist;
+                const mediaHistQtd = histQtd / countHist;
+                const mediaHistTicket = histTicket / countHist;
+
+                const ticketAtual = globalMensal[mesReferencia].clientes.size > 0 ? (globalMensal[mesReferencia].fatLiquido / globalMensal[mesReferencia].clientes.size) : 0;
+
+                const pctFat = calcGrowth(globalMensal[mesReferencia].fatLiquido, mediaHistFat);
+                const pctPos = calcGrowth(globalMensal[mesReferencia].clientes.size, mediaHistPos);
+                const pctBruto = calcGrowth(globalMensal[mesReferencia].vendasBrutas, mediaHistBruto);
+                const pctTicket = calcGrowth(ticketAtual, mediaHistTicket);
+                const pctQtd = calcGrowth(globalMensal[mesReferencia].qtd, mediaHistQtd);
+
+                setMomUI('mom-faturamento', pctFat, false, mesReferencia);
+                setMomUI('mom-positivacao', pctPos, false, mesReferencia);
+                setMomUI('mom-brutas', pctBruto, false, mesReferencia);
+                setMomUI('mom-ticket', pctTicket, false, mesReferencia);
+                setMomUI('mom-qtd', pctQtd, false, mesReferencia);
             } else {
-                ['mom-faturamento', 'mom-positivacao', 'mom-brutas', 'mom-ticket'].forEach(id => {
+                ['mom-faturamento', 'mom-positivacao', 'mom-brutas', 'mom-ticket', 'mom-qtd'].forEach(id => {
                     document.getElementById(id).innerHTML = `<span class="text-slate-500">Sem histórico MoM</span>`;
                 });
             }
 
-            renderTopProdutos(filtered);
-            
-            let totalCidades = {};
-            filtered.forEach(item => {
-                const vBruta = parseFloat(item.VendaBruta || 0);
-                const city = item.Cidade || "";
-                if (city && vBruta > 0) {
-                    totalCidades[city] = (totalCidades[city] || 0) + vBruta;
-                }
-            });
-            renderCidadesTable('table-cidades', totalCidades);
-
+            renderTopProdutos(filtered, globalSemFiltroMes, mesReferencia);
+            renderTopCidades(filtered, globalSemFiltroMes, mesReferencia);
             renderSupervisors(filtered);
             renderChart(mesesAtivos, mensalConsolidado);
         }
 
-        function getCampaignResult(posCount) {
-            const pos = Math.round(posCount);
-            if (pos < 35) {
-                return { startou: false, premio: 0, taxa: 0, faltam: 35 - pos, html: `<span class="bg-red-500/10 text-red-400 text-xs px-2.5 py-1 rounded-full font-bold border border-red-500/20">🔴 Faltam ${35 - pos}</span>` };
-            }
-            
-            let taxa = 1;
-            let label = "Startou!";
-            let badgeColor = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
-            
-            if (pos >= 35 && pos <= 50) {
-                taxa = 1;
-                label = "🟢 R$ 1/clt";
-            } else if (pos >= 51 && pos <= 60) {
-                taxa = 2;
-                label = "🔥 R$ 2/clt";
-                badgeColor = "bg-cyan-500/10 text-cyan-400 border-cyan-500/20";
-            } else if (pos >= 61 && pos <= 70) {
-                taxa = 3;
-                label = "⚡ R$ 3/clt";
-                badgeColor = "bg-amber-500/10 text-amber-400 border-amber-500/20";
-            } else {
-                taxa = 4;
-                label = "👑 R$ 4/clt";
-                badgeColor = "bg-violet-500/10 text-violet-400 border-violet-500/20";
-            }
-
-            const totalPremio = pos * taxa;
-            return {
-                startou: true,
-                premio: totalPremio,
-                taxa: taxa,
-                html: `<div class="flex flex-col items-center gap-0.5">
-                        <span class="${badgeColor} text-[10px] px-2 py-0.5 rounded-full font-bold border">${label}</span>
-                        <span class="text-white font-black text-xs">${formatCurrency(totalPremio)}</span>
-                       </div>`
-            };
-        }
-
-        function buildGlobalRankingTable() {
-            const selectedMonth = document.getElementById('ranking-filter-mes').value;
-            let vendMesData = {};
-
-            const isCampaignActive = mesesCampanha.includes(selectedMonth);
-            const headerCampanha = document.getElementById('ranking-header-campanha');
-            
-            if (isCampaignActive) {
-                headerCampanha.classList.remove('hidden');
-            } else {
-                headerCampanha.classList.add('hidden');
-            }
-
-            const dataToRank = globalData.filter(item => {
-                return !selectedMonth || item.Mês === selectedMonth;
-            });
-
-            dataToRank.forEach(item => {
-                const ven = item.Vendedor;
-                const cod = item.CodigoVendedor;
-                const mes = item.Mês;
-                const sup = item.Supervisor || "Sem Supervisor";
-                const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
-                const cliente = item.Cliente || "";
-
-                if (!ven) return;
-                if (!vendMesData[ven]) {
-                    vendMesData[ven] = { cod: cod, supervisor: sup, meses: {} };
-                }
-                if (!vendMesData[ven].meses[mes]) {
-                    vendMesData[ven].meses[mes] = { fat: 0, clientes: new Set() };
-                }
-
-                vendMesData[ven].meses[mes].fat += vLiquida;
-                if (cliente && vLiquida > 0) {
-                    vendMesData[ven].meses[mes].clientes.add(cliente);
-                }
-            });
-
-            currentRankingData = Object.entries(vendMesData).map(([name, info]) => {
-                const mesesEmAtividade = Object.keys(info.meses);
-                const totalMesesAtivos = mesesEmAtividade.length || 1;
-
-                let somaFat = 0;
-                let somaPos = 0;
-
-                mesesEmAtividade.forEach(m => {
-                    somaFat += info.meses[m].fat;
-                    somaPos += info.meses[m].clientes.size;
-                });
-
-                const mediaPos = somaPos / totalMesesAtivos;
-                const campaign = getCampaignResult(mediaPos);
-
-                return {
-                    name: name,
-                    cod: info.cod,
-                    supervisor: info.supervisor,
-                    mediaPositivacao: mediaPos,
-                    mediaFaturamento: somaFat / totalMesesAtivos,
-                    campanhaObj: campaign
-                };
-            }).sort((a, b) => b.mediaPositivacao - a.mediaPositivacao);
-
-            const tbody = document.getElementById('global-ranking-body');
-            tbody.innerHTML = currentRankingData.map((vendedor, index) => {
-                const posicaoNum = index + 1;
-                let medalha = `${posicaoNum}º`;
-                
-                if (posicaoNum === 1) medalha = "🥇 1º";
-                else if (posicaoNum === 2) medalha = "🥈 2º";
-                else if (posicaoNum === 3) medalha = "🥉 3º";
-
-                const cleanCode = String(vendedor.cod).trim();
-                const imgSrc = `Imagens_Vendedores/${cleanCode}.png`;
-
-                return `
-                    <tr class="hover:bg-slate-800/40 transition border-b border-slate-800">
-                        <td class="py-3 px-2 text-center font-bold text-white text-sm">${medalha}</td>
-                        <td class="py-3 px-4">
-                            <img class="h-10 w-10 rounded-full object-cover border border-slate-700 bg-slate-800 shrink-0" src="${imgSrc}" onerror="this.src='https://via.placeholder.com/100/131a2c/ffffff?text=${cleanCode}'">
-                        </td>
-                        <td class="py-3 px-4 font-semibold text-slate-200">
-                            ${vendedor.name} <span class="text-xs text-slate-500">(Cod: ${cleanCode})</span>
-                        </td>
-                        <td class="py-3 px-4 font-medium text-slate-400">
-                            ${vendedor.supervisor}
-                        </td>
-                        <td class="py-3 px-4 text-right font-bold text-vieiraYellow text-sm">
-                            ${Math.round(vendedor.mediaPositivacao)} Clientes
-                        </td>
-                        <td class="py-3 px-4 text-center ${isCampaignActive ? '' : 'hidden'}">
-                            ${vendedor.campanhaObj.html}
-                        </td>
-                        <td class="py-3 px-4 text-right font-semibold text-emerald-400">
-                            ${formatCurrency(vendedor.mediaFaturamento)}
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function exportRankingToCSV() {
-            if (currentRankingData.length === 0) return alert("Não há dados para exportar.");
-            
-            const selectedMonth = document.getElementById('ranking-filter-mes').value || "Geral";
-            const isCampaignActive = mesesCampanha.includes(selectedMonth);
-
-            let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
-            if (isCampaignActive) {
-                csvContent += "Posicao;Vendedor;Codigo;Supervisor;Media Positivacao (Clientes);Bonus Campanha (R$);Media Faturamento (R$)\n";
-            } else {
-                csvContent += "Posicao;Vendedor;Codigo;Supervisor;Media Positivacao (Clientes);Media Faturamento (R$)\n";
-            }
-
-            currentRankingData.forEach((v, index) => {
-                const pos = index + 1;
-                const fatFormated = v.mediaFaturamento.toFixed(2).replace('.', ',');
-                const posFormated = Math.round(v.mediaPositivacao);
-                
-                if (isCampaignActive) {
-                    const premioFormated = v.campanhaObj.premio.toFixed(2).replace('.', ',');
-                    csvContent += `${pos};"${v.name}";"${v.cod}";"${v.supervisor}";${posFormated};${premioFormated};${fatFormated}\n`;
-                } else {
-                    csvContent += `${pos};"${v.name}";"${v.cod}";"${v.supervisor}";${posFormated};${fatFormated}\n`;
-                }
-            });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Ranking_Vendedores_Medias_${selectedMonth}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function exportRankingToXLS() {
-            if (currentRankingData.length === 0) return alert("Não há dados para exportar.");
-
-            const selectedMonth = document.getElementById('ranking-filter-mes').value || "Geral";
-            const isCampaignActive = mesesCampanha.includes(selectedMonth);
-
-            let htmlTable = `
-                <table border="1">
-                    <tr style="background-color: #ED1C24; color: #FFFFFF; font-weight: bold;">
-                        <th>Posição</th>
-                        <th>Vendedor</th>
-                        <th>Código</th>
-                        <th>Supervisor</th>
-                        <th>Média de Positivação (Clientes)</th>
-                        ${isCampaignActive ? '<th>Bônus Campanha (R$)</th>' : ''}
-                        <th>Média de Faturamento Líquido (R$)</th>
-                    </tr>
-            `;
-
-            currentRankingData.forEach((v, index) => {
-                const pos = index + 1;
-                htmlTable += `
-                    <tr>
-                        <td>${pos}</td>
-                        <td>${v.name}</td>
-                        <td>${v.cod}</td>
-                        <td>${v.supervisor}</td>
-                        <td>${Math.round(v.mediaPositivacao)}</td>
-                        ${isCampaignActive ? `<td>${v.campanhaObj.premio.toFixed(2).replace('.', ',')}</td>` : ''}
-                        <td>${v.mediaFaturamento.toFixed(2).replace('.', ',')}</td>
-                    </tr>
-                `;
-            });
-
-            htmlTable += "</table>";
-
-            const blob = new Blob([htmlTable], { type: "application/vnd.ms-excel" });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `Ranking_Vendedores_Medias_${selectedMonth}.xls`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function openGlobalRankingModal() {
-            const lateralMonth = document.getElementById('filter-mes').value;
-            document.getElementById('ranking-filter-mes').value = lateralMonth;
-
-            buildGlobalRankingTable();
-            document.getElementById('global-ranking-modal').classList.remove('hidden');
-        }
-
-        function renderTopProdutos(filteredData) {
+        function renderTopProdutos(filteredData, globalSemFiltroMes, mesReferencia) {
             let prodMesData = {};
             filteredData.forEach(item => {
                 const prod = item.Produto;
                 const cod = item.CodigoProduto;
                 const mes = item.Mês;
                 const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
+                const qtd = parseFloat(item.Qtd_Vendida || 0);
                 const cliente = item.Cliente || "";
 
                 if (!prod) return;
                 if (!prodMesData[prod]) prodMesData[prod] = { cod: cod, meses: {} };
-                if (!prodMesData[prod].meses[mes]) prodMesData[prod].meses[mes] = { fat: 0, clientes: new Set() };
+                if (!prodMesData[prod].meses[mes]) prodMesData[prod].meses[mes] = { fat: 0, qtd: 0, clientes: new Set() };
 
                 prodMesData[prod].meses[mes].fat += vLiquida;
+                prodMesData[prod].meses[mes].qtd += qtd;
                 if (cliente && vLiquida > 0) prodMesData[prod].meses[mes].clientes.add(cliente);
             });
 
@@ -724,26 +548,34 @@
                 const mesesAtivos = Object.keys(info.meses).sort((a, b) => mesesOrdem.indexOf(a) - mesesOrdem.indexOf(b));
                 const totalMeses = mesesAtivos.length || 1;
 
-                let totalFat = 0, totalClientes = 0;
+                let totalFat = 0, totalClientes = 0, totalQtd = 0;
                 mesesAtivos.forEach(m => {
                     totalFat += info.meses[m].fat;
                     totalClientes += info.meses[m].clientes.size;
+                    totalQtd += info.meses[m].qtd;
                 });
 
                 const mediaFat = totalFat / totalMeses;
                 const mediaPos = totalClientes / totalMeses;
+                const mediaQtd = Math.round(totalQtd / totalMeses);
 
+                const indexRef = mesesOrdem.indexOf(mesReferencia);
+                const prodsAnteriores = globalSemFiltroMes.filter(i => i.Produto === prod && mesesOrdem.indexOf(i.Mês) < indexRef);
+                
                 let growth = 0;
-                if (mesesAtivos.length >= 2) {
-                    const indexUlt = (mesesAtivos[mesesAtivos.length - 1] === "Julho") ? mesesAtivos.length - 2 : mesesAtivos.length - 1;
-                    if (indexUlt > 0) {
-                        const ult = mesesAtivos[indexUlt];
-                        const pen = mesesAtivos[indexUlt - 1];
-                        growth = calcGrowth(info.meses[ult].fat, info.meses[pen].fat);
-                    }
+                if (prodsAnteriores.length > 0) {
+                    let fatAnteriorSum = 0;
+                    let mesesContados = new Set();
+                    prodsAnteriores.forEach(i => {
+                        fatAnteriorSum += parseFloat(i.FaturamentoLiquido || 0);
+                        mesesContados.add(i.Mês);
+                    });
+                    const mediaHistFat = fatAnteriorSum / (mesesContados.size || 1);
+                    const fatAtual = info.meses[mesReferencia] ? info.meses[mesReferencia].fat : mediaFat;
+                    growth = calcGrowth(fatAtual, mediaHistFat);
                 }
 
-                prodPerformance.push({ name: prod, cod: info.cod, mediaFat, mediaPos, growth });
+                prodPerformance.push({ name: prod, cod: info.cod, mediaFat, mediaPos, mediaQtd, growth });
             });
 
             prodPerformance.sort((a, b) => b.mediaFat - a.mediaFat);
@@ -759,161 +591,88 @@
                     <tr onclick="openProductModal('${p.name}', '${p.cod}')" class="border-b border-slate-800 hover:bg-slate-800/40 transition cursor-pointer">
                         <td class="py-2 flex items-center gap-2">
                             <img src="Imagens_produtos/${imgPath}" class="h-8 w-8 rounded object-cover bg-white shrink-0" onerror="this.src='https://via.placeholder.com/50?text=DV'">
-                            <span class="font-medium text-slate-200 truncate max-w-[150px] underline decoration-dotted">${p.name}</span>
+                            <span class="font-medium text-slate-200 truncate max-w-[130px] underline decoration-dotted">${p.name}</span>
                         </td>
                         <td class="py-2 text-right font-semibold text-white">${formatCurrency(p.mediaFat)}</td>
                         <td class="py-2 text-right text-slate-300">${Math.round(p.mediaPos)} Clt/Mês</td>
+                        <td class="py-2 text-right text-sky-400 font-semibold">${p.mediaQtd.toLocaleString('pt-BR')}</td>
                         <td class="py-2 text-right font-bold ${trendColor}">${trendIcon} ${Math.abs(p.growth).toFixed(1)}%</td>
                     </tr>
                 `;
             }).join('');
         }
 
-        function generateTeamHTML(supName) {
-            const data = globalData.filter(i => i.Supervisor === supName);
-            let vendMesData = {};
-
-            data.forEach(item => {
-                const ven = item.Vendedor;
-                const cod = item.CodigoVendedor;
+        function renderTopCidades(filteredData, globalSemFiltroMes, mesReferencia) {
+            let cityMesData = {};
+            filteredData.forEach(item => {
+                const city = item.Cidade;
                 const mes = item.Mês;
                 const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
+                const qtd = parseFloat(item.Qtd_Vendida || 0);
                 const cliente = item.Cliente || "";
 
-                if (!ven) return;
-                if (!vendMesData[ven]) vendMesData[ven] = { cod: cod, meses: {} };
-                if (!vendMesData[ven].meses[mes]) vendMesData[ven].meses[mes] = { fat: 0, clientes: new Set() };
+                if (!city) return;
+                if (!cityMesData[city]) cityMesData[city] = { meses: {} };
+                if (!cityMesData[city].meses[mes]) cityMesData[city].meses[mes] = { fat: 0, qtd: 0, clientes: new Set() };
 
-                vendMesData[ven].meses[mes].fat += vLiquida;
-                if (cliente && vLiquida > 0) vendMesData[ven].meses[mes].clientes.add(cliente);
+                cityMesData[city].meses[mes].fat += vLiquida;
+                cityMesData[city].meses[mes].qtd += qtd;
+                if (cliente && vLiquida > 0) cityMesData[city].meses[mes].clientes.add(cliente);
             });
 
-            const sortedTeam = Object.entries(vendMesData).map(([name, info]) => {
+            let cityPerformance = [];
+            Object.entries(cityMesData).forEach(([city, info]) => {
                 const mesesAtivos = Object.keys(info.meses).sort((a, b) => mesesOrdem.indexOf(a) - mesesOrdem.indexOf(b));
                 const totalMeses = mesesAtivos.length || 1;
 
-                let somaFat = 0, somaPos = 0;
+                let totalFat = 0, totalClientes = 0, totalQtd = 0;
                 mesesAtivos.forEach(m => {
-                    somaFat += info.meses[m].fat;
-                    somaPos += info.meses[m].clientes.size;
+                    totalFat += info.meses[m].fat;
+                    totalClientes += info.meses[m].clientes.size;
+                    totalQtd += info.meses[m].qtd;
                 });
 
-                const mediaFat = somaFat / totalMeses;
-                const mediaPos = Math.round(somaPos / totalMeses);
+                const mediaFat = totalFat / totalMeses;
+                const mediaPos = totalClientes / totalMeses;
+                const mediaQtd = Math.round(totalQtd / totalMeses);
 
-                let growthFat = 0;
-                if (mesesAtivos.length >= 2) {
-                    const indexUlt = (mesesAtivos[mesesAtivos.length - 1] === "Julho") ? mesesAtivos.length - 2 : mesesAtivos.length - 1;
-                    if (indexUlt > 0) {
-                        const ult = mesesAtivos[indexUlt];
-                        const pen = mesesAtivos[indexUlt - 1];
-                        growthFat = calcGrowth(info.meses[ult].fat, info.meses[pen].fat);
-                    }
+                const indexRef = mesesOrdem.indexOf(mesReferencia);
+                const cidadesAnteriores = globalSemFiltroMes.filter(i => i.Cidade === city && mesesOrdem.indexOf(i.Mês) < indexRef);
+
+                let growth = 0;
+                if (cidadesAnteriores.length > 0) {
+                    let fatAnteriorSum = 0;
+                    let mesesContados = new Set();
+                    cidadesAnteriores.forEach(i => {
+                        fatAnteriorSum += parseFloat(i.FaturamentoLiquido || 0);
+                        mesesContados.add(i.Mês);
+                    });
+                    const mediaHistFat = fatAnteriorSum / (mesesContados.size || 1);
+                    const fatAtual = info.meses[mesReferencia] ? info.meses[mesReferencia].fat : mediaFat;
+                    growth = calcGrowth(fatAtual, mediaHistFat);
                 }
 
-                return { name, info, mediaFat, mediaPos, growthFat };
-            }).sort((a, b) => b.mediaFat - a.mediaFat);
+                cityPerformance.push({ name: city, mediaFat, mediaPos, mediaQtd, growth });
+            });
 
-            return sortedTeam.map(member => {
-                const trendFatColor = member.growthFat >= 0 ? 'text-emerald-400' : 'text-rose-500';
-                const cleanCode = String(member.info.cod).trim();
-                const imgSrc = `Imagens_Vendedores/${cleanCode}.png`;
+            cityPerformance.sort((a, b) => b.mediaFat - a.mediaFat);
+            const top5 = cityPerformance.slice(0, 5);
+
+            const tbody = document.getElementById('table-cidades');
+            tbody.innerHTML = top5.map(c => {
+                const trendColor = c.growth >= 0 ? 'text-emerald-400' : 'text-rose-500';
+                const trendIcon = c.growth >= 0 ? '▲' : '▼';
 
                 return `
-                    <div class="flex items-center gap-4 bg-darkBg border border-slate-800 p-3 rounded-xl hover:border-slate-700 transition">
-                        <img class="h-14 w-14 rounded-full object-cover border-2 border-slate-700 bg-slate-800 shrink-0" src="${imgSrc}" onerror="this.src='https://via.placeholder.com/100/131a2c/ffffff?text=${cleanCode}'">
-                        <div class="flex-1 min-w-0">
-                            <h4 class="text-xs font-bold text-white truncate">${member.name} <span class="text-[10px] text-slate-500">(Cod: ${cleanCode})</span></h4>
-                            <div class="grid grid-cols-2 gap-2 mt-1 text-[11px] text-slate-300">
-                                <div>
-                                    <p class="text-slate-400 uppercase text-[9px]">Fat. Médio</p>
-                                    <p class="font-semibold">${formatCurrency(member.mediaFat)} <span class="${trendFatColor} text-[10px] ml-1 font-bold">${member.growthFat >= 0 ? '▲' : '▼'} ${Math.abs(member.growthFat).toFixed(1)}%</span></p>
-                                </div>
-                                <div>
-                                    <p class="text-slate-400 uppercase text-[9px]">Posit. Média</p>
-                                    <p class="font-semibold">${member.mediaPos} Clt/Mês</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <tr class="border-b border-slate-800 hover:bg-slate-800/40 transition">
+                        <td class="py-2 font-medium text-slate-200 max-w-[120px] truncate">${c.name}</td>
+                        <td class="py-2 text-right font-semibold text-white">${formatCurrency(c.mediaFat)}</td>
+                        <td class="py-2 text-right text-slate-300">${Math.round(c.mediaPos)} Clt/Mês</td>
+                        <td class="py-2 text-right text-sky-400 font-semibold">${c.mediaQtd.toLocaleString('pt-BR')}</td>
+                        <td class="py-2 text-right font-bold ${trendColor}">${trendIcon} ${Math.abs(c.growth).toFixed(1)}%</td>
+                    </tr>
                 `;
             }).join('');
-        }
-
-        function openTeam(supName) {
-            document.getElementById('team-modal-title').innerText = `Equipe de Vendas - ${supName}`;
-            const container = document.getElementById('team-list');
-            container.innerHTML = generateTeamHTML(supName);
-            document.getElementById('team-modal').classList.remove('hidden');
-        }
-
-        function renderChart(meses, dados) {
-            const ctx = document.getElementById('chart-evolucao').getContext('2d');
-            if (myChart) myChart.destroy();
-
-            const datasetFaturamento = meses.map(m => dados[m].fatLiquido);
-            const datasetPositivacao = meses.map(m => dados[m].clientes.size);
-
-            myChart = new Chart(ctx, {
-                data: {
-                    labels: meses,
-                    datasets: [
-                        {
-                            type: 'line',
-                            label: 'Fat. Líquido (R$)',
-                            data: datasetFaturamento,
-                            borderColor: '#ED1C24',
-                            borderWidth: 3,
-                            yAxisID: 'yFat'
-                        },
-                        {
-                            type: 'bar',
-                            label: 'Clientes Positivados',
-                            data: datasetPositivacao,
-                            backgroundColor: 'rgba(251, 191, 36, 0.4)',
-                            yAxisID: 'yPos'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        yFat: { type: 'linear', position: 'left', grid: { color: '#1e293b' } },
-                        yPos: { type: 'linear', position: 'right', grid: { drawOnChartArea: false } }
-                    }
-                }
-            });
-        }
-
-        function calcGrowth(atual, anterior) {
-            if (!anterior || anterior === 0) return 0;
-            return ((atual - anterior) / anterior) * 100;
-        }
-
-        function setMomUI(id, val, reverse = false, mesRef = '') {
-            const el = document.getElementById(id);
-            const color = val >= 0 ? (reverse ? 'text-rose-500' : 'text-emerald-400') : (reverse ? 'text-emerald-400' : 'text-rose-500');
-            const icon = val >= 0 ? '▲' : '▼';
-            el.innerHTML = `MoM (${mesRef}): <span class="${color} font-bold">${icon} ${Math.abs(val).toFixed(1)}%</span>`;
-        }
-
-        function renderCidadesTable(elementId, dataset) {
-            const sorted = Object.entries(dataset).sort((a, b) => b[1] - a[1]).slice(0, 5);
-            const tbody = document.getElementById(elementId);
-            
-            tbody.innerHTML = sorted.map(([name, val]) => `
-                <tr onclick="filterByCity('${name}')" class="border-b border-slate-800 hover:bg-slate-800/40 transition cursor-pointer">
-                    <td class="py-2.5 font-medium text-slate-200 max-w-[200px] truncate hover:text-vieiraYellow">${name}</td>
-                    <td class="py-2.5 text-right font-semibold text-white">${formatCurrency(val)}</td>
-                </tr>
-            `).join('');
-        }
-
-        function filterByCity(cityName) {
-            const select = document.getElementById('filter-cidade') || document.createElement('select');
-            select.value = cityName;
-            updateDashboard();
         }
 
         function renderSupervisors(filteredData) {
@@ -926,11 +685,8 @@
                 const cod = item.CodigoSupervisor || "";
                 if (!sup) return;
 
-                if (!supData[sup]) {
-                    supData[sup] = { fat: 0, pos: new Set(), cod: cod };
-                }
+                if (!supData[sup]) supData[sup] = { fat: 0, cod: cod };
                 supData[sup].fat += parseFloat(item.FaturamentoLiquido || 0);
-                if (item.Cliente) supData[sup].pos.add(item.Cliente);
             });
 
             Object.entries(supData).forEach(([name, info]) => {
@@ -962,32 +718,22 @@
                 const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
                 const cl = item.Cliente;
 
-                if (!mensal[mes]) {
-                    mensal[mes] = { fat: 0, pos: new Set() };
-                }
+                if (!mensal[mes]) mensal[mes] = { fat: 0, pos: new Set() };
                 mensal[mes].fat += vLiquida;
                 if (cl && vLiquida > 0) mensal[mes].pos.add(cl);
             });
 
-            const mesesAtivosList = Object.keys(mensal);
-            const totalSupervisorMeses = mesesAtivosList.length || 1;
-
-            let somaFat = 0;
-            let somaPos = 0;
-            mesesAtivosList.forEach(m => {
-                somaFat += mensal[m].fat;
-                somaPos += mensal[m].pos.size;
+            const totalSupervisorMeses = Object.keys(mensal).length || 1;
+            let somaFat = 0, somaPos = 0;
+            Object.values(mensal).forEach(m => {
+                somaFat += m.fat;
+                somaPos += m.pos.size;
             });
 
-            const mediaFat = somaFat / totalSupervisorMeses;
-            const mediaPos = Math.round(somaPos / totalSupervisorMeses);
-
             document.getElementById('sup-modal-name').innerText = supName;
-            document.getElementById('sup-modal-fat').innerText = formatCurrency(mediaFat);
-            document.getElementById('sup-modal-pos').innerText = `${mediaPos} Clientes/Mês`;
-
-            const cleanCode = String(supCod).trim();
-            document.getElementById('sup-modal-img').src = `Imagens_Supervisores/${cleanCode}.png`;
+            document.getElementById('sup-modal-fat').innerText = formatCurrency(somaFat / totalSupervisorMeses);
+            document.getElementById('sup-modal-pos').innerText = `${Math.round(somaPos / totalSupervisorMeses)} Clientes/Mês`;
+            document.getElementById('sup-modal-img').src = `Imagens_Supervisores/${String(supCod).trim()}.png`;
 
             const list = document.getElementById('sup-modal-mom-list');
             list.innerHTML = "";
@@ -1010,10 +756,63 @@
                 `;
             }
 
-            const teamContainer = document.getElementById('sup-modal-team-list');
-            teamContainer.innerHTML = generateTeamHTML(supName);
-
+            document.getElementById('sup-modal-team-list').innerHTML = generateTeamHTML(supName);
             document.getElementById('supervisor-modal').classList.remove('hidden');
+        }
+
+        function generateTeamHTML(supName) {
+            const data = globalData.filter(i => i.Supervisor === supName);
+            let vendMesData = {};
+
+            data.forEach(item => {
+                const ven = item.Vendedor;
+                const cod = item.CodigoVendedor;
+                const mes = item.Mês;
+                const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
+                const cliente = item.Cliente || "";
+
+                if (!ven) return;
+                if (!vendMesData[ven]) vendMesData[ven] = { cod: cod, meses: {} };
+                if (!vendMesData[ven].meses[mes]) vendMesData[ven].meses[mes] = { fat: 0, clientes: new Set() };
+
+                vendMesData[ven].meses[mes].fat += vLiquida;
+                if (cliente && vLiquida > 0) vendMesData[ven].meses[mes].clientes.add(cliente);
+            });
+
+            return Object.entries(vendMesData).map(([name, info]) => {
+                const totalMeses = Object.keys(info.meses).length || 1;
+                let somaFat = 0, somaPos = 0;
+                Object.values(info.meses).forEach(m => {
+                    somaFat += m.fat;
+                    somaPos += m.clientes.size;
+                });
+
+                const cleanCode = String(info.cod).trim();
+                return `
+                    <div class="flex items-center gap-4 bg-darkBg border border-slate-800 p-3 rounded-xl">
+                        <img class="h-12 w-12 rounded-full object-cover border border-slate-700 bg-slate-800 shrink-0" src="Imagens_Vendedores/${cleanCode}.png" onerror="this.src='https://via.placeholder.com/100/131a2c/ffffff?text=${cleanCode}'">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-xs font-bold text-white truncate">${name} <span class="text-[10px] text-slate-500">(Cod: ${cleanCode})</span></h4>
+                            <div class="grid grid-cols-2 gap-2 mt-1 text-[11px] text-slate-300">
+                                <div>
+                                    <p class="text-slate-400 uppercase text-[9px]">Fat. Médio</p>
+                                    <p class="font-semibold">${formatCurrency(somaFat / totalMeses)}</p>
+                                </div>
+                                <div>
+                                    <p class="text-slate-400 uppercase text-[9px]">Posit. Média</p>
+                                    <p class="font-semibold">${Math.round(somaPos / totalMeses)} Clt/Mês</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openTeam(supName) {
+            document.getElementById('team-modal-title').innerText = `Equipe de Vendas - ${supName}`;
+            document.getElementById('team-list').innerHTML = generateTeamHTML(supName);
+            document.getElementById('team-modal').classList.remove('hidden');
         }
 
         function openProductModal(prodName, prodCod) {
@@ -1025,9 +824,7 @@
                 const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
                 const cl = item.Cliente;
 
-                if (!mensal[mes]) {
-                    mensal[mes] = { fat: 0, pos: new Set() };
-                }
+                if (!mensal[mes]) mensal[mes] = { fat: 0, pos: new Set() };
                 mensal[mes].fat += vLiquida;
                 if (cl && vLiquida > 0) mensal[mes].pos.add(cl);
             });
@@ -1039,9 +836,7 @@
             document.getElementById('prod-modal-code').innerText = `Código: ${prodCod}`;
             document.getElementById('prod-modal-fat').innerText = formatCurrency(totalFat);
             document.getElementById('prod-modal-pos').innerText = `${clPositivados.size} Clientes`;
-
-            const cleanCod = String(prodCod).trim();
-            document.getElementById('prod-modal-img').src = `Imagens_produtos/${cleanCod}.png`;
+            document.getElementById('prod-modal-img').src = `Imagens_produtos/${String(prodCod).trim()}.png`;
 
             const list = document.getElementById('prod-modal-mom-list');
             list.innerHTML = "";
@@ -1067,19 +862,160 @@
             document.getElementById('product-modal').classList.remove('hidden');
         }
 
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
+        function buildGlobalRankingTable() {
+            const selectedMonth = document.getElementById('ranking-filter-mes').value;
+            let vendMesData = {};
+
+            const isCampaignActive = mesesCampanha.includes(selectedMonth);
+            const headerCampanha = document.getElementById('ranking-header-campanha');
+            
+            if (isCampaignActive) headerCampanha.classList.remove('hidden');
+            else headerCampanha.classList.add('hidden');
+
+            const dataToRank = globalData.filter(item => !selectedMonth || item.Mês === selectedMonth);
+
+            dataToRank.forEach(item => {
+                const ven = item.Vendedor;
+                const cod = item.CodigoVendedor;
+                const mes = item.Mês;
+                const sup = item.Supervisor || "Sem Supervisor";
+                const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
+                const qtd = parseFloat(item.Qtd_Vendida || 0);
+                const cliente = item.Cliente || "";
+
+                if (!ven) return;
+                if (!vendMesData[ven]) vendMesData[ven] = { cod: cod, supervisor: sup, meses: {} };
+                if (!vendMesData[ven].meses[mes]) vendMesData[ven].meses[mes] = { fat: 0, qtd: 0, clientes: new Set() };
+
+                vendMesData[ven].meses[mes].fat += vLiquida;
+                vendMesData[ven].meses[mes].qtd += qtd;
+                if (cliente && vLiquida > 0) vendMesData[ven].meses[mes].clientes.add(cliente);
+            });
+
+            currentRankingData = Object.entries(vendMesData).map(([name, info]) => {
+                const mesesEmAtividade = Object.keys(info.meses);
+                const totalMesesAtivos = mesesEmAtividade.length || 1;
+
+                let somaFat = 0, somaPos = 0, somaQtd = 0;
+                mesesEmAtividade.forEach(m => {
+                    somaFat += info.meses[m].fat;
+                    somaPos += info.meses[m].clientes.size;
+                    somaQtd += info.meses[m].qtd;
+                });
+
+                const mediaPos = somaPos / totalMesesAtivos;
+                const campaign = getCampaignResult(mediaPos);
+
+                return {
+                    name: name,
+                    cod: info.cod,
+                    supervisor: info.supervisor,
+                    mediaPositivacao: mediaPos,
+                    mediaQtd: somaQtd / totalMesesAtivos,
+                    mediaFaturamento: somaFat / totalMesesAtivos,
+                    campanhaObj: campaign
+                };
+            }).sort((a, b) => b.mediaPositivacao - a.mediaPositivacao);
+
+            const tbody = document.getElementById('global-ranking-body');
+            tbody.innerHTML = currentRankingData.map((vendedor, index) => {
+                const posicaoNum = index + 1;
+                let medalha = `${posicaoNum}º`;
+                
+                if (posicaoNum === 1) medalha = "🥇 1º";
+                else if (posicaoNum === 2) medalha = "🥈 2º";
+                else if (posicaoNum === 3) medalha = "🥉 3º";
+
+                const cleanCode = String(vendedor.cod).trim();
+                const imgSrc = `Imagens_Vendedores/${cleanCode}.png`;
+
+                return `
+                    <tr class="hover:bg-slate-800/40 transition border-b border-slate-800">
+                        <td class="py-3 px-2 text-center font-bold text-white text-sm">${medalha}</td>
+                        <td class="py-3 px-4">
+                            <img class="h-10 w-10 rounded-full object-cover border border-slate-700 bg-slate-800 shrink-0" src="${imgSrc}" onerror="this.src='https://via.placeholder.com/100/131a2c/ffffff?text=${cleanCode}'">
+                        </td>
+                        <td class="py-3 px-4 font-semibold text-slate-200">
+                            ${vendedor.name} <span class="text-xs text-slate-500">(Cod: ${cleanCode})</span>
+                        </td>
+                        <td class="py-3 px-4 font-medium text-slate-400">${vendedor.supervisor}</td>
+                        <td class="py-3 px-4 text-right font-bold text-vieiraYellow text-sm">${Math.round(vendedor.mediaPositivacao)} Clientes</td>
+                        <td class="py-3 px-4 text-right font-semibold text-sky-400">${Math.round(vendedor.mediaQtd).toLocaleString('pt-BR')}</td>
+                        <td class="py-3 px-4 text-center ${isCampaignActive ? '' : 'hidden'}">${vendedor.campanhaObj.html}</td>
+                        <td class="py-3 px-4 text-right font-semibold text-emerald-400">${formatCurrency(vendedor.mediaFaturamento)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getCampaignResult(posCount) {
+            const pos = Math.round(posCount);
+            if (pos < 35) {
+                return { startou: false, premio: 0, taxa: 0, faltam: 35 - pos, html: `<span class="bg-red-500/10 text-red-400 text-xs px-2.5 py-1 rounded-full font-bold border border-red-500/20">🔴 Faltam ${35 - pos}</span>` };
+            }
+            let taxa = pos <= 50 ? 1 : pos <= 60 ? 2 : pos <= 70 ? 3 : 4;
+            let label = pos <= 50 ? "🟢 R$ 1/clt" : pos <= 60 ? "🔥 R$ 2/clt" : pos <= 70 ? "⚡ R$ 3/clt" : "👑 R$ 4/clt";
+            const totalPremio = pos * taxa;
+            return {
+                startou: true, premio: totalPremio, taxa: taxa,
+                html: `<div class="flex flex-col items-center gap-0.5"><span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full font-bold border border-emerald-500/20">${label}</span><span class="text-white font-black text-xs">${formatCurrency(totalPremio)}</span></div>`
+            };
+        }
+
+        function renderChart(meses, dados) {
+            const ctx = document.getElementById('chart-evolucao').getContext('2d');
+            if (myChart) myChart.destroy();
+
+            myChart = new Chart(ctx, {
+                data: {
+                    labels: meses,
+                    datasets: [
+                        { type: 'line', label: 'Fat. Líquido (R$)', data: meses.map(m => dados[m].fatLiquido), borderColor: '#ED1C24', borderWidth: 3, yAxisID: 'yFat' },
+                        { type: 'bar', label: 'Clientes Positivados', data: meses.map(m => dados[m].clientes.size), backgroundColor: 'rgba(251, 191, 36, 0.4)', yAxisID: 'yPos' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        yFat: { type: 'linear', position: 'left', grid: { color: '#1e293b' } },
+                        yPos: { type: 'linear', position: 'right', grid: { drawOnChartArea: false } }
+                    }
+                }
+            });
+        }
+
+        function calcGrowth(atual, historico) {
+            if (!historico || historico === 0) return 0;
+            return ((atual - historico) / historico) * 100;
+        }
+
+        function setMomUI(id, val, reverse = false, mesRef = '') {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const color = val >= 0 ? (reverse ? 'text-rose-500' : 'text-emerald-400') : (reverse ? 'text-emerald-400' : 'text-rose-500');
+            const icon = val >= 0 ? '▲' : '▼';
+            el.innerHTML = `MoM (${mesRef}): <span class="${color} font-bold">${icon} ${Math.abs(val).toFixed(1)}%</span>`;
         }
 
         function formatCurrency(val) {
             return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function openGlobalRankingModal() {
+            buildGlobalRankingTable();
+            document.getElementById('global-ranking-modal').classList.remove('hidden');
+        }
+
         function clearFilters() {
-            document.getElementById('filter-ano').value = "";
-            document.getElementById('filter-mes').value = "";
-            document.getElementById('filter-supervisor').value = "";
-            document.getElementById('filter-vendedor').value = "";
+            ['filter-ano', 'filter-mes', 'filter-supervisor', 'filter-vendedor', 'filter-cidade', 'filter-produto'].forEach(id => {
+                const select = document.getElementById(id);
+                if (select) Array.from(select.options).forEach(o => o.selected = false);
+            });
             updateDashboard();
         }
     </script>
