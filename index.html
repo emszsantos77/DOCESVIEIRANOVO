@@ -120,11 +120,20 @@
                 </div>
             </div>
 
-            <!-- ÁREA DO GRÁFICO INTEGRADO -->
-            <div class="bg-darkCard p-5 rounded-xl border border-slate-800">
-                <h3 class="text-sm font-bold text-vieiraYellow mb-4 flex items-center gap-2">📈 Evolução Histórica & Crescimento MoM</h3>
-                <div class="h-64 relative">
-                    <canvas id="chart-evolucao"></canvas>
+            <!-- ÁREA DOS GRÁFICOS INTEGRADOS (LADO A LADO) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-darkCard p-5 rounded-xl border border-slate-800">
+                    <h3 class="text-sm font-bold text-vieiraYellow mb-4 flex items-center gap-2">📈 Evolução Histórica & Positivação</h3>
+                    <div class="h-64 relative">
+                        <canvas id="chart-evolucao"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-darkCard p-5 rounded-xl border border-slate-800">
+                    <h3 class="text-sm font-bold text-sky-400 mb-4 flex items-center gap-2">📦 Evolução Histórica & Quantidade Vendida</h3>
+                    <div class="h-64 relative">
+                        <canvas id="chart-evolucao-qtd"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -254,7 +263,7 @@
                     <span class="text-3xl">🏆</span>
                     <div>
                         <h3 class="text-lg sm:text-xl font-bold text-white tracking-wide">Ranking Geral de Vendedores</h3>
-                        <p class="text-xs text-slate-400">Performance comercial apresentada em valores de MÉDIAS mensais</p>
+                        <p class="text-xs text-slate-400">Classificação por Quantidade Vendida (Potes/Displays)</p>
                     </div>
                 </div>
                 
@@ -283,8 +292,8 @@
                                 <th class="py-3 px-4 w-16">Foto</th>
                                 <th class="py-3 px-4">Vendedor</th>
                                 <th class="py-3 px-4">Supervisor</th>
-                                <th class="py-3 px-4 text-right">Média Positivação</th>
                                 <th class="py-3 px-4 text-right">Média Qtd. Vendida</th>
+                                <th class="py-3 px-4 text-right">Média Positivação</th>
                                 <th id="ranking-header-campanha" class="py-3 px-4 text-center hidden">Campanha 🎯</th>
                                 <th class="py-3 px-4 text-right">Média Fat. Líquido</th>
                             </tr>
@@ -299,10 +308,11 @@
     <!-- CORE JAVASCRIPT -->
     <script>
         let myChart = null;
+        let myChartQtd = null;
         let globalData = [];
         let currentRankingData = []; 
         const mesesOrdem = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-        const mesesCampanha = ["Julho", "Agosto", "Setembro"];
+        const mesesCampanha = ["Outubro", "Novembro", "Dezembro"];
 
         document.addEventListener("DOMContentLoaded", () => {
             fetch('data.json?t=' + new Date().getTime())
@@ -320,17 +330,13 @@
                 .catch(err => console.error("Erro na inicialização:", err));
         });
 
-        // Seleção flexível sem necessidade da tecla CTRL
         function enableToggleMultiSelect() {
             document.querySelectorAll('select.custom-multiselect').forEach(select => {
                 select.addEventListener('mousedown', function(e) {
                     e.preventDefault();
-                    
                     const option = e.target.closest('option');
                     if (!option) return;
-
                     option.selected = !option.selected;
-
                     select.focus();
                     select.dispatchEvent(new Event('change', { bubbles: true }));
                 });
@@ -341,6 +347,31 @@
             const select = document.getElementById(id);
             if (!select) return [];
             return Array.from(select.selectedOptions).map(option => option.value).filter(val => val !== "");
+        }
+
+        function getFilteredData() {
+            const fAnos = getSelectValues('filter-ano');
+            const fMeses = getSelectValues('filter-mes');
+            const fSups = getSelectValues('filter-supervisor');
+            const fVens = getSelectValues('filter-vendedor');
+            const fCidades = getSelectValues('filter-cidade');
+            const fProds = getSelectValues('filter-produto');
+
+            return globalData.filter(item => {
+                const ano = String(item.Ano || '');
+                const mes = String(item.Mês || '');
+                const sup = item.Supervisor || '';
+                const ven = item.Vendedor || '';
+                const cid = item.Cidade || '';
+                const prod = item.Produto || '';
+
+                return (fAnos.length === 0 || fAnos.includes(ano)) &&
+                       (fMeses.length === 0 || fMeses.includes(mes)) &&
+                       (fSups.length === 0 || fSups.includes(sup)) &&
+                       (fVens.length === 0 || fVens.includes(ven)) &&
+                       (fCidades.length === 0 || fCidades.includes(cid)) &&
+                       (fProds.length === 0 || fProds.includes(prod));
+            });
         }
 
         function populateFilters() {
@@ -376,28 +407,13 @@
         }
 
         function updateDashboard() {
+            const filtered = getFilteredData();
             const fAnos = getSelectValues('filter-ano');
             const fMeses = getSelectValues('filter-mes');
             const fSups = getSelectValues('filter-supervisor');
             const fVens = getSelectValues('filter-vendedor');
             const fCidades = getSelectValues('filter-cidade');
             const fProds = getSelectValues('filter-produto');
-
-            const filtered = globalData.filter(item => {
-                const ano = String(item.Ano || '');
-                const mes = String(item.Mês || '');
-                const sup = item.Supervisor || '';
-                const ven = item.Vendedor || '';
-                const cid = item.Cidade || '';
-                const prod = item.Produto || '';
-
-                return (fAnos.length === 0 || fAnos.includes(ano)) &&
-                       (fMeses.length === 0 || fMeses.includes(mes)) &&
-                       (fSups.length === 0 || fSups.includes(sup)) &&
-                       (fVens.length === 0 || fVens.includes(ven)) &&
-                       (fCidades.length === 0 || fCidades.includes(cid)) &&
-                       (fProds.length === 0 || fProds.includes(prod));
-            });
 
             let mensalConsolidado = {};
             filtered.forEach(item => {
@@ -685,8 +701,9 @@
                 const cod = item.CodigoSupervisor || "";
                 if (!sup) return;
 
-                if (!supData[sup]) supData[sup] = { fat: 0, cod: cod };
+                if (!supData[sup]) supData[sup] = { fat: 0, qtd: 0, cod: cod };
                 supData[sup].fat += parseFloat(item.FaturamentoLiquido || 0);
+                supData[sup].qtd += parseFloat(item.Qtd_Vendida || 0);
             });
 
             Object.entries(supData).forEach(([name, info]) => {
@@ -696,9 +713,12 @@
                 container.innerHTML += `
                     <div class="bg-darkBg border border-slate-800 p-4 rounded-xl flex items-center gap-4 hover:border-vieiraYellow/50 transition">
                         <img onclick="openSupervisorDetails('${name}', '${cleanCode}')" class="h-16 w-16 rounded-full object-cover border-2 border-slate-700 hover:border-vieiraYellow cursor-pointer bg-slate-800 shrink-0" src="${imgSrc}" onerror="this.src='https://via.placeholder.com/150/131a2c/ffffff?text=${name.substring(0,1)}'">
-                        <div class="flex-1">
-                            <h4 class="text-sm font-bold text-white">${name}</h4>
-                            <p class="text-xs text-slate-400 mt-0.5">${formatCurrency(info.fat)}</p>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-bold text-white truncate">${name}</h4>
+                            <div class="mt-1 space-y-0.5">
+                                <p class="text-xs text-slate-300 font-semibold">${formatCurrency(info.fat)}</p>
+                                <p class="text-xs text-sky-400 font-medium">${Math.round(info.qtd).toLocaleString('pt-BR')} Unid.</p>
+                            </div>
                             <div class="flex gap-2 mt-2">
                                 <button onclick="openSupervisorDetails('${name}', '${cleanCode}')" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded text-slate-200">Desempenho</button>
                                 <button onclick="openTeam('${name}')" class="text-[10px] bg-vieiraRed hover:bg-red-700 px-2.5 py-1 rounded text-white font-semibold">Exibir Equipe</button>
@@ -710,7 +730,8 @@
         }
 
         function openSupervisorDetails(supName, supCod) {
-            const data = globalData.filter(i => i.Supervisor === supName);
+            const filteredData = getFilteredData();
+            const data = filteredData.filter(i => i.Supervisor === supName);
             let mensal = {};
 
             data.forEach(item => {
@@ -756,12 +777,13 @@
                 `;
             }
 
-            document.getElementById('sup-modal-team-list').innerHTML = generateTeamHTML(supName);
+            document.getElementById('sup-modal-team-list').innerHTML = generateTeamHTML(supName, data);
             document.getElementById('supervisor-modal').classList.remove('hidden');
         }
 
-        function generateTeamHTML(supName) {
-            const data = globalData.filter(i => i.Supervisor === supName);
+        function generateTeamHTML(supName, optionalFilteredData = null) {
+            const sourceData = optionalFilteredData || getFilteredData();
+            const data = sourceData.filter(i => i.Supervisor === supName);
             let vendMesData = {};
 
             data.forEach(item => {
@@ -769,38 +791,59 @@
                 const cod = item.CodigoVendedor;
                 const mes = item.Mês;
                 const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
+                const qtd = parseFloat(item.Qtd_Vendida || 0);
                 const cliente = item.Cliente || "";
 
                 if (!ven) return;
                 if (!vendMesData[ven]) vendMesData[ven] = { cod: cod, meses: {} };
-                if (!vendMesData[ven].meses[mes]) vendMesData[ven].meses[mes] = { fat: 0, clientes: new Set() };
+                if (!vendMesData[ven].meses[mes]) vendMesData[ven].meses[mes] = { fat: 0, qtd: 0, clientes: new Set() };
 
                 vendMesData[ven].meses[mes].fat += vLiquida;
+                vendMesData[ven].meses[mes].qtd += qtd;
                 if (cliente && vLiquida > 0) vendMesData[ven].meses[mes].clientes.add(cliente);
             });
 
-            return Object.entries(vendMesData).map(([name, info]) => {
+            const teamList = Object.entries(vendMesData).map(([name, info]) => {
                 const totalMeses = Object.keys(info.meses).length || 1;
-                let somaFat = 0, somaPos = 0;
+                let somaFat = 0, somaPos = 0, somaQtd = 0;
                 Object.values(info.meses).forEach(m => {
                     somaFat += m.fat;
                     somaPos += m.clientes.size;
+                    somaQtd += m.qtd;
                 });
 
-                const cleanCode = String(info.cod).trim();
+                return {
+                    name,
+                    cod: info.cod,
+                    fatMedio: somaFat / totalMeses,
+                    posMedia: somaPos / totalMeses,
+                    qtdMedia: somaQtd / totalMeses
+                };
+            }).sort((a, b) => b.qtdMedia - a.qtdMedia);
+
+            if (teamList.length === 0) {
+                return `<p class="text-xs text-slate-500 text-center py-4">Nenhum vendedor encontrado com os filtros selecionados.</p>`;
+            }
+
+            return teamList.map(v => {
+                const cleanCode = String(v.cod).trim();
                 return `
                     <div class="flex items-center gap-4 bg-darkBg border border-slate-800 p-3 rounded-xl">
                         <img class="h-12 w-12 rounded-full object-cover border border-slate-700 bg-slate-800 shrink-0" src="Imagens_Vendedores/${cleanCode}.png" onerror="this.src='https://via.placeholder.com/100/131a2c/ffffff?text=${cleanCode}'">
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-xs font-bold text-white truncate">${name} <span class="text-[10px] text-slate-500">(Cod: ${cleanCode})</span></h4>
-                            <div class="grid grid-cols-2 gap-2 mt-1 text-[11px] text-slate-300">
+                            <h4 class="text-xs font-bold text-white truncate">${v.name} <span class="text-[10px] text-slate-500">(Cod: ${cleanCode})</span></h4>
+                            <div class="grid grid-cols-3 gap-2 mt-1 text-[11px] text-slate-300">
                                 <div>
                                     <p class="text-slate-400 uppercase text-[9px]">Fat. Médio</p>
-                                    <p class="font-semibold">${formatCurrency(somaFat / totalMeses)}</p>
+                                    <p class="font-semibold">${formatCurrency(v.fatMedio)}</p>
                                 </div>
                                 <div>
                                     <p class="text-slate-400 uppercase text-[9px]">Posit. Média</p>
-                                    <p class="font-semibold">${Math.round(somaPos / totalMeses)} Clt/Mês</p>
+                                    <p class="font-semibold">${Math.round(v.posMedia)} Clt/Mês</p>
+                                </div>
+                                <div>
+                                    <p class="text-slate-400 uppercase text-[9px]">Qtd. Média</p>
+                                    <p class="font-semibold text-sky-400">${Math.round(v.qtdMedia).toLocaleString('pt-BR')} Unid.</p>
                                 </div>
                             </div>
                         </div>
@@ -816,7 +859,8 @@
         }
 
         function openProductModal(prodName, prodCod) {
-            const data = globalData.filter(i => i.Produto === prodName);
+            const filteredData = getFilteredData();
+            const data = filteredData.filter(i => i.Produto === prodName);
             let mensal = {};
 
             data.forEach(item => {
@@ -872,7 +916,8 @@
             if (isCampaignActive) headerCampanha.classList.remove('hidden');
             else headerCampanha.classList.add('hidden');
 
-            const dataToRank = globalData.filter(item => !selectedMonth || item.Mês === selectedMonth);
+            const filteredData = getFilteredData();
+            const dataToRank = filteredData.filter(item => !selectedMonth || item.Mês === selectedMonth);
 
             dataToRank.forEach(item => {
                 const ven = item.Vendedor;
@@ -903,19 +948,19 @@
                     somaQtd += info.meses[m].qtd;
                 });
 
-                const mediaPos = somaPos / totalMesesAtivos;
-                const campaign = getCampaignResult(mediaPos);
+                const mediaQtd = somaQtd / totalMesesAtivos;
+                const campaign = getCampaignResult(mediaQtd);
 
                 return {
                     name: name,
                     cod: info.cod,
                     supervisor: info.supervisor,
-                    mediaPositivacao: mediaPos,
-                    mediaQtd: somaQtd / totalMesesAtivos,
+                    mediaPositivacao: somaPos / totalMesesAtivos,
+                    mediaQtd: mediaQtd,
                     mediaFaturamento: somaFat / totalMesesAtivos,
                     campanhaObj: campaign
                 };
-            }).sort((a, b) => b.mediaPositivacao - a.mediaPositivacao);
+            }).sort((a, b) => b.mediaQtd - a.mediaQtd);
 
             const tbody = document.getElementById('global-ranking-body');
             tbody.innerHTML = currentRankingData.map((vendedor, index) => {
@@ -939,8 +984,8 @@
                             ${vendedor.name} <span class="text-xs text-slate-500">(Cod: ${cleanCode})</span>
                         </td>
                         <td class="py-3 px-4 font-medium text-slate-400">${vendedor.supervisor}</td>
-                        <td class="py-3 px-4 text-right font-bold text-vieiraYellow text-sm">${Math.round(vendedor.mediaPositivacao)} Clientes</td>
-                        <td class="py-3 px-4 text-right font-semibold text-sky-400">${Math.round(vendedor.mediaQtd).toLocaleString('pt-BR')}</td>
+                        <td class="py-3 px-4 text-right font-bold text-sky-400 text-sm">${Math.round(vendedor.mediaQtd).toLocaleString('pt-BR')} Potes/Disp</td>
+                        <td class="py-3 px-4 text-right font-semibold text-vieiraYellow">${Math.round(vendedor.mediaPositivacao)} Clientes</td>
                         <td class="py-3 px-4 text-center ${isCampaignActive ? '' : 'hidden'}">${vendedor.campanhaObj.html}</td>
                         <td class="py-3 px-4 text-right font-semibold text-emerald-400">${formatCurrency(vendedor.mediaFaturamento)}</td>
                     </tr>
@@ -948,25 +993,35 @@
             }).join('');
         }
 
-        function getCampaignResult(posCount) {
-            const pos = Math.round(posCount);
-            if (pos < 35) {
-                return { startou: false, premio: 0, taxa: 0, faltam: 35 - pos, html: `<span class="bg-red-500/10 text-red-400 text-xs px-2.5 py-1 rounded-full font-bold border border-red-500/20">🔴 Faltam ${35 - pos}</span>` };
+        function getCampaignResult(qtdCount) {
+            const qtd = Math.round(qtdCount);
+            if (qtd < 50) {
+                return { 
+                    startou: false, 
+                    premio: 0, 
+                    taxa: 0, 
+                    faltam: 50 - qtd, 
+                    html: `<span class="bg-red-500/10 text-red-400 text-xs px-2.5 py-1 rounded-full font-bold border border-red-500/20">🔴 Faltam ${50 - qtd}</span>` 
+                };
             }
-            let taxa = pos <= 50 ? 1 : pos <= 60 ? 2 : pos <= 70 ? 3 : 4;
-            let label = pos <= 50 ? "🟢 R$ 1/clt" : pos <= 60 ? "🔥 R$ 2/clt" : pos <= 70 ? "⚡ R$ 3/clt" : "👑 R$ 4/clt";
-            const totalPremio = pos * taxa;
+            let taxa = qtd < 100 ? 1 : qtd < 200 ? 2 : 3;
+            let label = qtd < 100 ? "🟢 R$ 1/unid" : qtd < 200 ? "🔥 R$ 2/unid" : "⚡ R$ 3/unid";
+            const totalPremio = qtd * taxa;
             return {
-                startou: true, premio: totalPremio, taxa: taxa,
+                startou: true, 
+                premio: totalPremio, 
+                taxa: taxa,
                 html: `<div class="flex flex-col items-center gap-0.5"><span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full font-bold border border-emerald-500/20">${label}</span><span class="text-white font-black text-xs">${formatCurrency(totalPremio)}</span></div>`
             };
         }
 
+        // RENDERIZAÇÃO DOS DOIS GRÁFICOS LADO A LADO
         function renderChart(meses, dados) {
-            const ctx = document.getElementById('chart-evolucao').getContext('2d');
+            // 1. Gráfico de Faturamento vs Positivação
+            const ctxPos = document.getElementById('chart-evolucao').getContext('2d');
             if (myChart) myChart.destroy();
 
-            myChart = new Chart(ctx, {
+            myChart = new Chart(ctxPos, {
                 data: {
                     labels: meses,
                     datasets: [
@@ -980,6 +1035,28 @@
                     scales: {
                         yFat: { type: 'linear', position: 'left', grid: { color: '#1e293b' } },
                         yPos: { type: 'linear', position: 'right', grid: { drawOnChartArea: false } }
+                    }
+                }
+            });
+
+            // 2. Gráfico de Faturamento vs Quantidade Vendida (Potes/Displays)
+            const ctxQtd = document.getElementById('chart-evolucao-qtd').getContext('2d');
+            if (myChartQtd) myChartQtd.destroy();
+
+            myChartQtd = new Chart(ctxQtd, {
+                data: {
+                    labels: meses,
+                    datasets: [
+                        { type: 'line', label: 'Fat. Líquido (R$)', data: meses.map(m => dados[m].fatLiquido), borderColor: '#ED1C24', borderWidth: 3, yAxisID: 'yFat' },
+                        { type: 'bar', label: 'Qtd. Vendida (Potes/Disp)', data: meses.map(m => dados[m].qtd), backgroundColor: 'rgba(56, 189, 248, 0.4)', yAxisID: 'yQtd' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        yFat: { type: 'linear', position: 'left', grid: { color: '#1e293b' } },
+                        yQtd: { type: 'linear', position: 'right', grid: { drawOnChartArea: false } }
                     }
                 }
             });
