@@ -120,7 +120,7 @@
                 </div>
             </div>
 
-            <!-- ÁREA DOS GRÁFICOS INTEGRADOS (LADO A LADO) -->
+            <!-- ÁREA DOS GRÁFICOS INTEGRADOS -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-darkCard p-5 rounded-xl border border-slate-800">
                     <h3 class="text-sm font-bold text-vieiraYellow mb-4 flex items-center gap-2">📈 Evolução Histórica & Positivação</h3>
@@ -130,7 +130,7 @@
                 </div>
 
                 <div class="bg-darkCard p-5 rounded-xl border border-slate-800">
-                    <h3 class="text-sm font-bold text-sky-400 mb-4 flex items-center gap-2">📦 Evolução Histórica & Quantidade Vendida</h3>
+                    <h3 class="text-sm font-bold text-sky-400 mb-4 flex items-center gap-2">📦 Evolução Histórica & Quantidade Vendida (Potes/Displays)</h3>
                     <div class="h-64 relative">
                         <canvas id="chart-evolucao-qtd"></canvas>
                     </div>
@@ -176,9 +176,9 @@
                 </div>
             </div>
 
-            <!-- RANKING DE SUPERVISORES -->
+            <!-- RANKING DE SUPERVISORES (Classificados por Potes/Displays) -->
             <div class="bg-darkCard p-5 rounded-xl border border-slate-800">
-                <h3 class="text-sm font-bold text-vieiraYellow mb-4 flex items-center gap-2">👑 Performance de Supervisão</h3>
+                <h3 class="text-sm font-bold text-vieiraYellow mb-4 flex items-center gap-2">👑 Performance de Supervisão (Rankeado por Pote/Display)</h3>
                 <div id="supervisors-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
             </div>
 
@@ -239,7 +239,7 @@
                     </div>
                 </div>
                 <div class="border-t md:border-t-0 md:border-l border-slate-800 pt-5 md:pt-0 md:pl-6 flex flex-col min-h-0">
-                    <h3 class="text-xs sm:text-sm font-bold text-vieiraYellow uppercase mb-3 flex items-center gap-2"><i class="fa-solid fa-users"></i> Ranking da Equipe de Vendas</h3>
+                    <h3 class="text-xs sm:text-sm font-bold text-vieiraYellow uppercase mb-3 flex items-center gap-2"><i class="fa-solid fa-users"></i> Ranking da Equipe de Vendas (por Pote/Display)</h3>
                     <div id="sup-modal-team-list" class="space-y-2.5 overflow-y-auto pr-2 flex-1 max-h-[300px] md:max-h-[380px]"></div>
                 </div>
             </div>
@@ -263,7 +263,7 @@
                     <span class="text-3xl">🏆</span>
                     <div>
                         <h3 class="text-lg sm:text-xl font-bold text-white tracking-wide">Ranking Geral de Vendedores</h3>
-                        <p class="text-xs text-slate-400">Classificação por Quantidade Vendida (Potes/Displays)</p>
+                        <p class="text-xs text-slate-400">Classificação por Quantidade Vendida (Potes/Displays Elegíveis)</p>
                     </div>
                 </div>
                 
@@ -271,14 +271,6 @@
                     <div class="flex items-center gap-2">
                         <label class="text-xs text-slate-400 whitespace-nowrap">Filtrar por Mês:</label>
                         <select id="ranking-filter-mes" onchange="buildGlobalRankingTable()" class="bg-darkBg border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:border-vieiraRed outline-none min-w-[150px]"></select>
-                    </div>
-                    <div class="flex gap-1.5">
-                        <button onclick="exportRankingToCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold py-2 px-3 rounded-lg text-xs flex items-center gap-1.5 transition">
-                            <i class="fa-solid fa-file-csv text-emerald-400"></i> Exportar CSV
-                        </button>
-                        <button onclick="exportRankingToXLS()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold py-2 px-3 rounded-lg text-xs flex items-center gap-1.5 transition">
-                            <i class="fa-solid fa-file-excel text-emerald-500"></i> Exportar XLS
-                        </button>
                     </div>
                 </div>
             </div>
@@ -292,7 +284,7 @@
                                 <th class="py-3 px-4 w-16">Foto</th>
                                 <th class="py-3 px-4">Vendedor</th>
                                 <th class="py-3 px-4">Supervisor</th>
-                                <th class="py-3 px-4 text-right">Média Qtd. Vendida</th>
+                                <th class="py-3 px-4 text-right">Qtd. Elegível (Potes/Disp)</th>
                                 <th class="py-3 px-4 text-right">Média Positivação</th>
                                 <th id="ranking-header-campanha" class="py-3 px-4 text-center hidden">Campanha 🎯</th>
                                 <th class="py-3 px-4 text-right">Média Fat. Líquido</th>
@@ -313,6 +305,14 @@
         let currentRankingData = []; 
         const mesesOrdem = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
         const mesesCampanha = ["Outubro", "Novembro", "Dezembro"];
+
+        // Lista estrita de produtos elegíveis (Potes e Displays anexados)
+        const codigosElegiveisCampanha = [
+            "308260", "308314", "535163", "308338", "308352", "335859", 
+            "335187", "335842", "11230", "11220", "308130", "335354", 
+            "335088", "335620", "335095", "20009342", "1296", "335613", 
+            "97976", "335590", "308024", "335347", "1223", "97921", "20009090"
+        ];
 
         document.addEventListener("DOMContentLoaded", () => {
             fetch('data.json?t=' + new Date().getTime())
@@ -423,40 +423,46 @@
                 const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
                 const qtd = parseFloat(item.Qtd_Vendida || 0);
                 const cliente = item.Cliente || "";
+                const codProd = String(item.CodigoProduto || "").trim();
 
                 if (!mensalConsolidado[mes]) {
-                    mensalConsolidado[mes] = { fatLiquido: 0, vendasBrutas: 0, devolucoes: 0, qtd: 0, clientes: new Set() };
+                    mensalConsolidado[mes] = { fatLiquido: 0, vendasBrutas: 0, devolucoes: 0, qtd: 0, qtdElegivel: 0, clientes: new Set() };
                 }
 
                 mensalConsolidado[mes].fatLiquido += vLiquida;
                 mensalConsolidado[mes].vendasBrutas += vBruta;
                 mensalConsolidado[mes].devolucoes += dev;
                 mensalConsolidado[mes].qtd += qtd;
+                
+                if (codigosElegiveisCampanha.includes(codProd)) {
+                    mensalConsolidado[mes].qtdElegivel += qtd;
+                }
+
                 if (cliente && vLiquida > 0) mensalConsolidado[mes].clientes.add(cliente);
             });
 
             const mesesAtivos = Object.keys(mensalConsolidado).sort((a, b) => mesesOrdem.indexOf(a) - mesesOrdem.indexOf(b));
             const totalMeses = mesesAtivos.length || 1;
 
-            let somaFatLiquido = 0, somaVendasBrutas = 0, somaClientesPositivados = 0, somaQtd = 0;
+            let somaFatLiquido = 0, somaVendasBrutas = 0, somaClientesPositivados = 0, somaQtdElegivel = 0;
             mesesAtivos.forEach(m => {
                 somaFatLiquido += mensalConsolidado[m].fatLiquido;
                 somaVendasBrutas += mensalConsolidado[m].vendasBrutas;
                 somaClientesPositivados += mensalConsolidado[m].clientes.size;
-                somaQtd += mensalConsolidado[m].qtd;
+                somaQtdElegivel += mensalConsolidado[m].qtdElegivel;
             });
 
             const mediaFatLiquido = somaFatLiquido / totalMeses;
             const mediaVendasBrutas = somaVendasBrutas / totalMeses;
             const mediaClientesPositivados = Math.round(somaClientesPositivados / totalMeses);
-            const mediaQtd = Math.round(somaQtd / totalMeses);
+            const mediaQtdElegivel = Math.round(somaQtdElegivel / totalMeses);
             const mediaTicket = mediaClientesPositivados > 0 ? (mediaFatLiquido / mediaClientesPositivados) : 0;
 
             document.getElementById('kpi-faturamento').innerText = formatCurrency(mediaFatLiquido);
             document.getElementById('kpi-positivacao').innerText = `${mediaClientesPositivados} Clientes/Mês`;
             document.getElementById('kpi-brutas').innerText = formatCurrency(mediaVendasBrutas);
             document.getElementById('kpi-ticket').innerText = formatCurrency(mediaTicket);
-            document.getElementById('kpi-qtd').innerText = `${mediaQtd.toLocaleString('pt-BR')} Unid.`;
+            document.getElementById('kpi-qtd').innerText = `${mediaQtdElegivel.toLocaleString('pt-BR')} Unid.`;
 
             let mesReferencia = fMeses.length > 0 ? fMeses[fMeses.length - 1] : mesesAtivos[mesesAtivos.length - 1];
 
@@ -481,13 +487,17 @@
                 const vBruta = parseFloat(item.VendaBruta || 0);
                 const qtd = parseFloat(item.Qtd_Vendida || 0);
                 const cliente = item.Cliente || "";
+                const codProd = String(item.CodigoProduto || "").trim();
 
                 if (!globalMensal[mes]) {
-                    globalMensal[mes] = { fatLiquido: 0, vendasBrutas: 0, qtd: 0, clientes: new Set() };
+                    globalMensal[mes] = { fatLiquido: 0, vendasBrutas: 0, qtd: 0, qtdElegivel: 0, clientes: new Set() };
                 }
                 globalMensal[mes].fatLiquido += vLiquida;
                 globalMensal[mes].vendasBrutas += vBruta;
                 globalMensal[mes].qtd += qtd;
+                if (codigosElegiveisCampanha.includes(codProd)) {
+                    globalMensal[mes].qtdElegivel += qtd;
+                }
                 if (cliente && vLiquida > 0) globalMensal[mes].clientes.add(cliente);
             });
 
@@ -503,7 +513,7 @@
                     histFat += globalMensal[m].fatLiquido;
                     histPos += globalMensal[m].clientes.size;
                     histBruto += globalMensal[m].vendasBrutas;
-                    histQtd += globalMensal[m].qtd;
+                    histQtd += globalMensal[m].qtdElegivel;
                     const t = globalMensal[m].clientes.size > 0 ? (globalMensal[m].fatLiquido / globalMensal[m].clientes.size) : 0;
                     histTicket += t;
                 });
@@ -521,7 +531,7 @@
                 const pctPos = calcGrowth(globalMensal[mesReferencia].clientes.size, mediaHistPos);
                 const pctBruto = calcGrowth(globalMensal[mesReferencia].vendasBrutas, mediaHistBruto);
                 const pctTicket = calcGrowth(ticketAtual, mediaHistTicket);
-                const pctQtd = calcGrowth(globalMensal[mesReferencia].qtd, mediaHistQtd);
+                const pctQtd = calcGrowth(globalMensal[mesReferencia].qtdElegivel, mediaHistQtd);
 
                 setMomUI('mom-faturamento', pctFat, false, mesReferencia);
                 setMomUI('mom-positivacao', pctPos, false, mesReferencia);
@@ -699,14 +709,24 @@
             filteredData.forEach(item => {
                 const sup = item.Supervisor;
                 const cod = item.CodigoSupervisor || "";
+                const codProd = String(item.CodigoProduto || "").trim();
+                const qtd = parseFloat(item.Qtd_Vendida || 0);
+
                 if (!sup) return;
 
-                if (!supData[sup]) supData[sup] = { fat: 0, qtd: 0, cod: cod };
+                if (!supData[sup]) supData[sup] = { fat: 0, qtdElegivel: 0, cod: cod };
                 supData[sup].fat += parseFloat(item.FaturamentoLiquido || 0);
-                supData[sup].qtd += parseFloat(item.Qtd_Vendida || 0);
+                
+                // Contabiliza apenas os potes/displays elegíveis para a ordenação
+                if (codigosElegiveisCampanha.includes(codProd)) {
+                    supData[sup].qtdElegivel += qtd;
+                }
             });
 
-            Object.entries(supData).forEach(([name, info]) => {
+            // Ordena os supervisores por quantidade elegível vendida de forma decrescente
+            const sortedSupervisors = Object.entries(supData).sort((a, b) => b[1].qtdElegivel - a[1].qtdElegivel);
+
+            sortedSupervisors.forEach(([name, info]) => {
                 const cleanCode = String(info.cod).trim();
                 const imgSrc = `Imagens_Supervisores/${cleanCode}.png`;
 
@@ -717,7 +737,7 @@
                             <h4 class="text-sm font-bold text-white truncate">${name}</h4>
                             <div class="mt-1 space-y-0.5">
                                 <p class="text-xs text-slate-300 font-semibold">${formatCurrency(info.fat)}</p>
-                                <p class="text-xs text-sky-400 font-medium">${Math.round(info.qtd).toLocaleString('pt-BR')} Unid.</p>
+                                <p class="text-xs text-sky-400 font-medium">${Math.round(info.qtdElegivel).toLocaleString('pt-BR')} Potes/Disp</p>
                             </div>
                             <div class="flex gap-2 mt-2">
                                 <button onclick="openSupervisorDetails('${name}', '${cleanCode}')" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded text-slate-200">Desempenho</button>
@@ -793,23 +813,28 @@
                 const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
                 const qtd = parseFloat(item.Qtd_Vendida || 0);
                 const cliente = item.Cliente || "";
+                const codProd = String(item.CodigoProduto || "").trim();
 
                 if (!ven) return;
                 if (!vendMesData[ven]) vendMesData[ven] = { cod: cod, meses: {} };
-                if (!vendMesData[ven].meses[mes]) vendMesData[ven].meses[mes] = { fat: 0, qtd: 0, clientes: new Set() };
+                if (!vendMesData[ven].meses[mes]) vendMesData[ven].meses[mes] = { fat: 0, qtdElegivel: 0, clientes: new Set() };
 
                 vendMesData[ven].meses[mes].fat += vLiquida;
-                vendMesData[ven].meses[mes].qtd += qtd;
+                
+                if (codigosElegiveisCampanha.includes(codProd)) {
+                    vendMesData[ven].meses[mes].qtdElegivel += qtd;
+                }
+
                 if (cliente && vLiquida > 0) vendMesData[ven].meses[mes].clientes.add(cliente);
             });
 
             const teamList = Object.entries(vendMesData).map(([name, info]) => {
                 const totalMeses = Object.keys(info.meses).length || 1;
-                let somaFat = 0, somaPos = 0, somaQtd = 0;
+                let somaFat = 0, somaPos = 0, somaQtdElegivel = 0;
                 Object.values(info.meses).forEach(m => {
                     somaFat += m.fat;
                     somaPos += m.clientes.size;
-                    somaQtd += m.qtd;
+                    somaQtdElegivel += m.qtdElegivel;
                 });
 
                 return {
@@ -817,7 +842,7 @@
                     cod: info.cod,
                     fatMedio: somaFat / totalMeses,
                     posMedia: somaPos / totalMeses,
-                    qtdMedia: somaQtd / totalMeses
+                    qtdMedia: somaQtdElegivel / totalMeses
                 };
             }).sort((a, b) => b.qtdMedia - a.qtdMedia);
 
@@ -843,7 +868,7 @@
                                 </div>
                                 <div>
                                     <p class="text-slate-400 uppercase text-[9px]">Qtd. Média</p>
-                                    <p class="font-semibold text-sky-400">${Math.round(v.qtdMedia).toLocaleString('pt-BR')} Unid.</p>
+                                    <p class="font-semibold text-sky-400">${Math.round(v.qtdMedia).toLocaleString('pt-BR')} Potes/Disp</p>
                                 </div>
                             </div>
                         </div>
@@ -927,13 +952,18 @@
                 const vLiquida = parseFloat(item.FaturamentoLiquido || 0);
                 const qtd = parseFloat(item.Qtd_Vendida || 0);
                 const cliente = item.Cliente || "";
+                const codProd = String(item.CodigoProduto || "").trim();
 
                 if (!ven) return;
                 if (!vendMesData[ven]) vendMesData[ven] = { cod: cod, supervisor: sup, meses: {} };
-                if (!vendMesData[ven].meses[mes]) vendMesData[ven].meses[mes] = { fat: 0, qtd: 0, clientes: new Set() };
+                if (!vendMesData[ven].meses[mes]) vendMesData[ven].meses[mes] = { fat: 0, qtdElegivel: 0, clientes: new Set() };
 
                 vendMesData[ven].meses[mes].fat += vLiquida;
-                vendMesData[ven].meses[mes].qtd += qtd;
+                
+                if (codigosElegiveisCampanha.includes(codProd)) {
+                    vendMesData[ven].meses[mes].qtdElegivel += qtd;
+                }
+
                 if (cliente && vLiquida > 0) vendMesData[ven].meses[mes].clientes.add(cliente);
             });
 
@@ -941,22 +971,22 @@
                 const mesesEmAtividade = Object.keys(info.meses);
                 const totalMesesAtivos = mesesEmAtividade.length || 1;
 
-                let somaFat = 0, somaPos = 0, somaQtd = 0;
+                let somaFat = 0, somaPos = 0, somaQtdElegivel = 0;
                 mesesEmAtividade.forEach(m => {
                     somaFat += info.meses[m].fat;
                     somaPos += info.meses[m].clientes.size;
-                    somaQtd += info.meses[m].qtd;
+                    somaQtdElegivel += info.meses[m].qtdElegivel;
                 });
 
-                const mediaQtd = somaQtd / totalMesesAtivos;
-                const campaign = getCampaignResult(mediaQtd);
+                const mediaQtdElegivel = somaQtdElegivel / totalMesesAtivos;
+                const campaign = getCampaignResult(mediaQtdElegivel);
 
                 return {
                     name: name,
                     cod: info.cod,
                     supervisor: info.supervisor,
                     mediaPositivacao: somaPos / totalMesesAtivos,
-                    mediaQtd: mediaQtd,
+                    mediaQtd: mediaQtdElegivel,
                     mediaFaturamento: somaFat / totalMesesAtivos,
                     campanhaObj: campaign
                 };
@@ -1015,9 +1045,7 @@
             };
         }
 
-        // RENDERIZAÇÃO DOS DOIS GRÁFICOS LADO A LADO
         function renderChart(meses, dados) {
-            // 1. Gráfico de Faturamento vs Positivação
             const ctxPos = document.getElementById('chart-evolucao').getContext('2d');
             if (myChart) myChart.destroy();
 
@@ -1039,7 +1067,6 @@
                 }
             });
 
-            // 2. Gráfico de Faturamento vs Quantidade Vendida (Potes/Displays)
             const ctxQtd = document.getElementById('chart-evolucao-qtd').getContext('2d');
             if (myChartQtd) myChartQtd.destroy();
 
@@ -1048,7 +1075,7 @@
                     labels: meses,
                     datasets: [
                         { type: 'line', label: 'Fat. Líquido (R$)', data: meses.map(m => dados[m].fatLiquido), borderColor: '#ED1C24', borderWidth: 3, yAxisID: 'yFat' },
-                        { type: 'bar', label: 'Qtd. Vendida (Potes/Disp)', data: meses.map(m => dados[m].qtd), backgroundColor: 'rgba(56, 189, 248, 0.4)', yAxisID: 'yQtd' }
+                        { type: 'bar', label: 'Qtd. Vendida (Potes/Disp)', data: meses.map(m => dados[m].qtdElegivel), backgroundColor: 'rgba(56, 189, 248, 0.4)', yAxisID: 'yQtd' }
                     ]
                 },
                 options: {
